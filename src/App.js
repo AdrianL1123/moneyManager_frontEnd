@@ -1,25 +1,40 @@
-import logo from './logo.svg';
-import './App.css';
+import "./index.css"; // Ensure this file exists and is correctly located
 
-function App() {
+import { BrowserRouter, Routes, Route } from "react-router-dom"; // Ensure you're using React Router v6
+import { QueryClientProvider, QueryClient } from "@tanstack/react-query";
+import { CookiesProvider } from "react-cookie";
+
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import Categories from "./pages/Categories";
+import Profile from "./pages/Profile";
+import CategoryIncome from "./pages/CategoriesIncome";
+import { SnackbarProvider } from "material-ui-snackbar-provider"; // Ensure this package is installed and imported correctly
+import CustomSnackbar from "./components/CustomSnackbar";
+
+const queryClient = new QueryClient();
+
+export default function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
+    <QueryClientProvider client={queryClient}>
+      <CookiesProvider defaultSetOptions={{ path: "/" }}>
+        <SnackbarProvider
+          SnackbarComponent={CustomSnackbar}
+          SnackbarProps={{ autoHideDuration: 4000 }}
         >
-          Learn React
-        </a>
-      </header>
-    </div>
+          <BrowserRouter>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/categories" element={<Categories />} />
+              <Route path="/categoriesIncome" element={<CategoryIncome />} />
+            </Routes>
+          </BrowserRouter>
+        </SnackbarProvider>
+      </CookiesProvider>
+    </QueryClientProvider>
   );
 }
-
-export default App;

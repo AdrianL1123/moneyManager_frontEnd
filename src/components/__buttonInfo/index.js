@@ -1,8 +1,12 @@
 import { Button, Box, Grid, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import InfoIcon from "@mui/icons-material/Info";
-
+import { useState } from "react";
+import DialogInfo from "../Dialog_info";
 export default function ButtonInfo() {
+  const [openInfoDialog, setOpenInfoDialog] = useState(false);
+  const handleOpenInfoDialog = () => setOpenInfoDialog(true);
+  const handleCloseInfoDialog = () => setOpenInfoDialog(false);
   const navigate = useNavigate();
   return (
     <Box
@@ -28,9 +32,7 @@ export default function ButtonInfo() {
           flexDirection: "column",
           backgroundColor: "#333333",
         }}
-        onClick={() => {
-          navigate("/");
-        }}
+        onClick={handleOpenInfoDialog}
       >
         <Grid container spacing={2} justifyContent="center" alignItems="center">
           <Grid item xs={1} container justifyContent="center">
@@ -49,6 +51,10 @@ export default function ButtonInfo() {
           </Grid>
         </Grid>
       </Button>
+      <DialogInfo
+        openInfoDialog={openInfoDialog}
+        handleCloseInfoDialog={handleCloseInfoDialog}
+      />
     </Box>
   );
 }

@@ -12,21 +12,22 @@ import BottomNav from "../../components/bottomNav";
 import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
-import ButtonInfo from "../../components/buttonInfo";
+// import ButtonInfo from "../../components/buttonInfo";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useCookies } from "react-cookie";
-import useCustomSnackbar from "../../components/useCustomSnackbar";
+import { useState } from "react";
+import DialogLogout from "../../components/DialogLogout";
 
 export default function Profile() {
-  const snackbar = useCustomSnackbar();
+  //logout
+  const [openLogoutDialog, setOpenLogoutDialog] = useState(false);
+  const handleOpenLogoutDialog = () => setOpenLogoutDialog(true);
+  const handleCloseLogoutDialog = () => setOpenLogoutDialog(false);
+  //logout
+
   const navigate = useNavigate();
   const [cookies, setCookie, removeCookie] = useCookies(["currentUser"]);
   const { currentUser } = cookies;
-
-  const handleLogout = () => {
-    removeCookie("currentUser");
-    navigate("/profile");
-  };
 
   return (
     <>
@@ -86,7 +87,7 @@ export default function Profile() {
                 flexDirection: "column",
                 backgroundColor: "#333333",
               }}
-              onClick={handleLogout}
+              onClick={handleOpenLogoutDialog}
             >
               <Grid
                 container
@@ -110,6 +111,10 @@ export default function Profile() {
                 </Grid>
               </Grid>
             </Button>
+            <DialogLogout
+              openLogoutDialog={openLogoutDialog}
+              handleCloseLogoutDialog={handleCloseLogoutDialog}
+            />
           </Box>
         ) : (
           <>
@@ -216,7 +221,7 @@ export default function Profile() {
             </Box>
           </>
         )}
-        <ButtonInfo />
+        {/* <ButtonInfo /> */}
 
         <BottomNav />
       </div>

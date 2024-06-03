@@ -26,6 +26,7 @@ import {
   getCategoriesIncome,
 } from "../../utils/api_categoriesIncome";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import DialogCategoryIncomeEdit from "../../components/Dialog_CategoryIncome_Edit";
 
 export default function CategoryIncome() {
   const queryClient = useQueryClient();
@@ -38,6 +39,20 @@ export default function CategoryIncome() {
 
   const handleCloseDialogIncome = () => {
     setOpenDialogIncome(false);
+  };
+
+  // Edit category dialog state
+  const [openCategoryIncomeEditDialog, setOpenEditIncomeDialog] =
+    useState(false);
+  const [selectedIncomeCategory, setSelectedIncomeCategory] = useState(null);
+
+  const handleOpenEditIncomeDialog = (category) => {
+    setSelectedIncomeCategory(category);
+    setOpenEditIncomeDialog(true);
+  };
+  const handleCloseEditIncomeDialog = () => {
+    setOpenEditIncomeDialog(false);
+    setSelectedIncomeCategory(null);
   };
 
   const [cookies] = useCookies(["currentUser"]);
@@ -142,7 +157,12 @@ export default function CategoryIncome() {
                         {c.name}
                       </TableCell>
                       <TableCell align="right" sx={{ color: "white" }}>
-                        <Button sx={{ color: "#FEE12B" }}>Edit</Button>
+                        <Button
+                          sx={{ color: "#FEE12B" }}
+                          onClick={() => handleOpenEditIncomeDialog(c)}
+                        >
+                          Edit
+                        </Button>
                         <Button
                           sx={{ color: "#FEE12B" }}
                           onClick={() => handleDeleteCategoryIncome(c._id)}
@@ -168,6 +188,15 @@ export default function CategoryIncome() {
           </TableContainer>
         </Container>
       </Container>
+
+      {selectedIncomeCategory && (
+        <DialogCategoryIncomeEdit
+          openCategoryIncomeEditDialog={setOpenEditIncomeDialog}
+          handleCloseCategoryIncomeEditDialog={handleCloseEditIncomeDialog}
+          item={selectedIncomeCategory}
+        />
+      )}
+
       <BottomNav />
     </>
   );

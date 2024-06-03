@@ -10,11 +10,6 @@ import {
   TableCell,
   TableBody,
   Button,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  DialogActions,
 } from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
@@ -28,27 +23,37 @@ import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getCategories } from "../../utils/api_categories";
-import { useNavigate } from "react-router-dom";
 import DialogCategoryAdd from "../../components/Dialog_Category_Add";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteCategory } from "../../utils/api_categories";
+import DialogCategoryEdit from "../../components/Dialog_Category_Edit";
 
-export default function () {
+export default function Categories() {
   const queryClient = useQueryClient();
-
   const snackbar = useCustomSnackbar();
 
-  //dialog
+  // Add category dialog state
   const [openDialog, setOpenDialog] = useState(false);
   const handleOpenDialog = () => {
     setOpenDialog(true);
   };
-
   const handleCloseDialog = () => {
     setOpenDialog(false);
   };
-  //dialog
+
+  // Edit category dialog state
+  const [openEditDialog, setOpenEditDialog] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+
+  const handleOpenEditDialog = (category) => {
+    setSelectedCategory(category);
+    setOpenEditDialog(true);
+  };
+  const handleCloseEditDialog = () => {
+    setOpenEditDialog(false);
+    setSelectedCategory(null);
+  };
 
   const [cookies] = useCookies(["currentUser"]);
   const { currentUser = {} } = cookies;
@@ -80,32 +85,27 @@ export default function () {
     }
   };
 
-  const navigate = useNavigate();
-
-  //delete
   const deleteCategoryMutation = useMutation({
     mutationFn: deleteCategory,
     onSuccess: () => {
-      // display success message
       snackbar.showSuccess("Category has been successfully deleted");
       queryClient.invalidateQueries({
         queryKey: ["categories"],
       });
     },
     onError: (error) => {
-      // display error message
       snackbar.showError(error.response.data.message);
     },
   });
+
   const handleDeleteCategory = (_id) => {
     const answer = window.confirm(
-      "Are you sure you want to remove this order?"
+      "Are you sure you want to remove this category?"
     );
     if (answer) {
       deleteCategoryMutation.mutate({ token, _id });
     }
   };
-  //delete
 
   return (
     <>
@@ -131,9 +131,7 @@ export default function () {
           <Button
             endIcon={<PlaylistAddIcon />}
             sx={{ fontSize: "12px", color: "#FEE12B" }}
-            onClick={() => {
-              setOpenDialog(true);
-            }}
+            onClick={handleOpenDialog}
           >
             Add A Category
           </Button>
@@ -160,7 +158,7 @@ export default function () {
               <TableBody>
                 {categories.length > 0 ? (
                   categories.map((c) => (
-                    <TableRow key={c.id}>
+                    <TableRow key={c._id}>
                       <TableCell width={"20%"} sx={{ color: "white" }}>
                         {getIconComponent(c.icon)}
                       </TableCell>
@@ -168,12 +166,15 @@ export default function () {
                         {c.name}
                       </TableCell>
                       <TableCell align="right" sx={{ color: "white" }}>
-                        <Button sx={{ color: "#FEE12B" }}>Edit</Button>
                         <Button
                           sx={{ color: "#FEE12B" }}
-                          onClick={() => {
-                            handleDeleteCategory(c._id);
-                          }}
+                          onClick={() => handleOpenEditDialog(c)}
+                        >
+                          Edit
+                        </Button>
+                        <Button
+                          sx={{ color: "#FEE12B" }}
+                          onClick={() => handleDeleteCategory(c._id)}
                         >
                           Remove
                         </Button>
@@ -196,6 +197,14 @@ export default function () {
           </TableContainer>
         </Container>
       </Container>
+
+      {selectedCategory && (
+        <DialogCategoryEdit
+          openCategoryEditDialog={openEditDialog}
+          handleCloseCategoryEditDialog={handleCloseEditDialog}
+          item={selectedCategory}
+        />
+      )}
 
       <BottomNav />
     </>

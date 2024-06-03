@@ -2,8 +2,10 @@ import { useState } from "react";
 import { useCookies } from "react-cookie";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import {
+  Box,
   Button,
   Container,
+  Divider,
   MenuItem,
   Table,
   TableBody,
@@ -13,6 +15,11 @@ import {
   TableRow,
   Typography,
 } from "@mui/material";
+import PriceCheckIcon from "@mui/icons-material/PriceCheck";
+import NewReleasesIcon from "@mui/icons-material/NewReleases";
+import TimelapseIcon from "@mui/icons-material/Timelapse";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import EmojiTransportationIcon from "@mui/icons-material/EmojiTransportation";
@@ -25,15 +32,27 @@ import TopNav from "../../components/topNav";
 import BottomNav from "../../components/bottomNav";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
 import { getExpenses } from "../../utils/api_expense";
+import { getIncomes } from "../../utils/api_income";
 import { getCategories } from "../../utils/api_categories";
 import DialogMainAdd from "../../components/Dialog_MainAdd";
+import { getCategoriesIncome } from "../../utils/api_categoriesIncome";
+import DialogIncomeAdd from "../../components/Dialog_Add_Income";
 
 export default function Home() {
-  const queryClient = useQueryClient();
-  const snackbar = useCustomSnackbar();
+  // const queryClient = useQueryClient();
+  // const snackbar = useCustomSnackbar();
+
+  //expenses
   const [openMainDialog, setOpenMainDialog] = useState(false);
   const handleOpenMainDialog = () => setOpenMainDialog(true);
   const handleCloseMainDialog = () => setOpenMainDialog(false);
+  //expenses
+
+  // Income
+  const [openIncomeDialog, setOpenIncomeDialog] = useState(false);
+  const handleOpenIncomeDialog = () => setOpenIncomeDialog(true);
+  const handleCloseIncomeDialog = () => setOpenIncomeDialog(false);
+  // Income
 
   const [cookies] = useCookies(["currentUser"]);
   const { currentUser = {} } = cookies;
@@ -44,10 +63,20 @@ export default function Home() {
     queryFn: () => getExpenses(token),
   });
 
-  const { data: categories = [] } = useQuery({
-    queryKey: ["categories", token],
-    queryFn: () => getCategories(token),
+  const { data: incomes = [] } = useQuery({
+    queryKey: ["incomes", token],
+    queryFn: () => getIncomes(token),
   });
+
+  // const { data: categoriesIncome = [] } = useQuery({
+  //   queryKey: ["categoriesIncome", token],
+  //   queryFn: () => getCategoriesIncome(token),
+  // });
+
+  // const { data: categories = [] } = useQuery({
+  //   queryKey: ["categories", token],
+  //   queryFn: () => getCategories(token),
+  // });
 
   const today = new Date();
   const currentDay = today.getDay();
@@ -99,21 +128,71 @@ export default function Home() {
     }
   };
 
+  const getIconIncomeComponent = (iconNameIncome) => {
+    switch (iconNameIncome) {
+      case "Salary":
+        return <AttachMoneyIcon />;
+      case "Part-Time":
+        return <TimelapseIcon />;
+      case "Investments":
+        return <PriceCheckIcon />;
+      case "Bonus":
+        return <NewReleasesIcon />;
+      default:
+        return null;
+    }
+  };
+
   return (
     <>
       <TopNav />
-      <Container style={{ paddingTop: "20px", width: "100%" }}>
-        <Button
-          endIcon={<AddCircleIcon />}
-          color="warning"
-          fullWidth
-          onClick={handleOpenMainDialog}
-        >
-          Add
-        </Button>
+      <Container
+        style={{
+          paddingTop: "20px",
+          width: "100%",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexDirection: "column",
+        }}
+      >
+        <Box sx={{ display: "flex", padding: "20px" }}>
+          <Button
+            endIcon={<AddCircleIcon />}
+            color="warning"
+            onClick={handleOpenMainDialog}
+            sx={{ justifyContent: "center", color: "#FEE12B" }}
+          >
+            Add Expenses
+          </Button>
+          <Divider
+            sx={{
+              borderColor: "#FEE12B",
+              height: "30px",
+              margin: "auto",
+            }}
+            orientation="vertical"
+            variant="middle"
+            flexItem
+          />
+          <Button
+            endIcon={<AddCircleIcon />}
+            color="warning"
+            onClick={handleOpenIncomeDialog}
+            sx={{ justifyContent: "center", color: "#FEE12B" }}
+          >
+            Add Income
+          </Button>
+        </Box>
+
         <DialogMainAdd
           openMainDialog={openMainDialog}
           handleCloseMainDialog={handleCloseMainDialog}
+        />
+
+        <DialogIncomeAdd
+          openIncomeDialog={openIncomeDialog}
+          handleCloseIncomeDialog={handleCloseIncomeDialog}
         />
         <Container
           sx={{
@@ -124,7 +203,7 @@ export default function Home() {
             flexDirection: "column",
           }}
         >
-          {expenses.length > 0 ? (
+          {expenses.length > 0 || incomes.length > 0 ? (
             <TableContainer sx={{ maxWidth: "100%", width: "100%" }}>
               <Table>
                 <TableHead>
@@ -155,6 +234,19 @@ export default function Home() {
                       </TableCell>
                     </TableRow>
                   ))}
+                  {incomes.map((income) => (
+                    <TableRow key={income._id}>
+                      <TableCell width={"20%"} sx={{ color: "white" }}>
+                        {getIconComponent(income.category.name)}
+                      </TableCell>
+                      <TableCell align="left" sx={{ color: "white" }}>
+                        {income.name}
+                      </TableCell>
+                      <TableCell align="right" sx={{ color: "white" }}>
+                        {income.amount}
+                      </TableCell>
+                    </TableRow>
+                  ))}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -167,7 +259,7 @@ export default function Home() {
               }}
             >
               <Typography align="center" variant="h4" sx={{ color: "white" }}>
-                No Expenses added yet.
+                No Expenses/Income added yet.
               </Typography>
             </Container>
           )}

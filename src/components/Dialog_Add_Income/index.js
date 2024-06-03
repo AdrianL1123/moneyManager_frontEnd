@@ -10,23 +10,19 @@ import {
   DialogContent,
   DialogActions,
 } from "@mui/material";
-import {
-  Restaurant as RestaurantIcon,
-  SportsEsports as SportsEsportsIcon,
-  Favorite as FavoriteIcon,
-  CardGiftcard as CardGiftcardIcon,
-  EmojiTransportation as EmojiTransportationIcon,
-  Pets as PetsIcon,
-  ShoppingBag as ShoppingBagIcon,
-} from "@mui/icons-material";
+import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import TimelapseIcon from "@mui/icons-material/Timelapse";
+import PriceCheckIcon from "@mui/icons-material/PriceCheck";
+import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import { useCookies } from "react-cookie";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { addExpense } from "../../utils/api_expense";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
+import { addIncome } from "../../utils/api_income";
 
-export default function DialogMainAdd({
-  openMainDialog,
-  handleCloseMainDialog,
+export default function DialogIncomeAdd({
+  openIncomeDialog,
+  handleCloseIncomeDialog,
 }) {
   const snackbar = useCustomSnackbar();
   const queryClient = useQueryClient();
@@ -39,23 +35,23 @@ export default function DialogMainAdd({
   const [category, setCategory] = useState("Category");
   const [description, setDescription] = useState("");
 
-  const addMainExpensesMutation = useMutation({
-    mutationFn: addExpense,
+  const addIncomeMutation = useMutation({
+    mutationFn: addIncome,
     onSuccess: () => {
-      snackbar.showSuccess("Expense added.");
-      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+      snackbar.showSuccess("Income added.");
+      queryClient.invalidateQueries({ queryKey: ["incomes"] });
       setName("");
       setAmount(0);
       setCategory("Category");
       setDescription("");
-      handleCloseMainDialog(false);
+      handleCloseIncomeDialog(false);
     },
     onError: (error) => {
       snackbar.showError(error.response.data.message);
     },
   });
 
-  const handleAddExpenses = () => {
+  const handleAddIncome = () => {
     if (!name || !amount || !category) {
       snackbar.showWarning("Please fill in the details.");
     } else if (category === "Category") {
@@ -63,7 +59,7 @@ export default function DialogMainAdd({
     } else if (amount === 0) {
       snackbar.showWarning("Amount cannot be zero");
     } else {
-      addMainExpensesMutation.mutate({
+      addIncomeMutation.mutate({
         name,
         amount,
         description,
@@ -74,11 +70,11 @@ export default function DialogMainAdd({
   };
 
   return (
-    <Dialog open={openMainDialog} onClose={handleCloseMainDialog}>
-      <DialogTitle>What did you Spend Today?</DialogTitle>
+    <Dialog open={openIncomeDialog} onClose={handleCloseIncomeDialog}>
+      <DialogTitle>Your Income</DialogTitle>
       <DialogContent>
         <TextField
-          placeholder="Expenses"
+          placeholder="Income"
           variant="outlined"
           fullWidth
           value={name}
@@ -111,33 +107,21 @@ export default function DialogMainAdd({
           <MenuItem value="Category">
             <Typography>Category</Typography>
           </MenuItem>
-          <MenuItem value="Shopping">
-            <ShoppingBagIcon />
-            <Typography>Shopping</Typography>
+          <MenuItem value="Salary">
+            <AttachMoneyIcon />
+            <Typography>Salary</Typography>
           </MenuItem>
-          <MenuItem value="Food">
-            <RestaurantIcon />
-            <Typography>Food</Typography>
+          <MenuItem value="Part-Time">
+            <TimelapseIcon />
+            <Typography>Part Time</Typography>
           </MenuItem>
-          <MenuItem value="Transportation">
-            <EmojiTransportationIcon />
-            <Typography>Transportation</Typography>
+          <MenuItem value="Investments">
+            <PriceCheckIcon />
+            <Typography>Investments</Typography>
           </MenuItem>
-          <MenuItem value="Entertainment">
-            <SportsEsportsIcon />
-            <Typography>Entertainment</Typography>
-          </MenuItem>
-          <MenuItem value="Pet">
-            <PetsIcon />
-            <Typography>Pet</Typography>
-          </MenuItem>
-          <MenuItem value="Health">
-            <FavoriteIcon />
-            <Typography>Health</Typography>
-          </MenuItem>
-          <MenuItem value="Gift">
-            <CardGiftcardIcon />
-            <Typography>Gift</Typography>
+          <MenuItem value="Bonus">
+            <NewReleasesIcon />
+            <Typography>Bonus</Typography>
           </MenuItem>
         </Select>
       </DialogContent>
@@ -145,11 +129,11 @@ export default function DialogMainAdd({
         <Button
           variant="contained"
           color="warning"
-          onClick={handleCloseMainDialog}
+          onClick={handleCloseIncomeDialog}
         >
           Cancel
         </Button>
-        <Button variant="contained" color="warning" onClick={handleAddExpenses}>
+        <Button variant="contained" color="warning" onClick={handleAddIncome}>
           Add
         </Button>
       </DialogActions>

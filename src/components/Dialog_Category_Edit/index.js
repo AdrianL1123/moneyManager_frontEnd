@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Button,
   MenuItem,
@@ -21,12 +21,13 @@ import {
 } from "@mui/icons-material";
 import { useCookies } from "react-cookie";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addExpense } from "../../utils/api_expense";
+import { updateExpense } from "../../utils/api_expense";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
 
-export default function DialogMainAdd({
-  openMainDialog,
-  handleCloseMainDialog,
+export default function DialogCategoryEdit({
+  openCategoryEditDialog,
+  handleCloseCategoryEditDialog,
+  item,
 }) {
   const snackbar = useCustomSnackbar();
   const queryClient = useQueryClient();
@@ -34,82 +35,57 @@ export default function DialogMainAdd({
   const { currentUser = {} } = cookies;
   const { token } = currentUser;
 
-  const [name, setName] = useState("");
-  const [amount, setAmount] = useState(0);
-  const [category, setCategory] = useState("Category");
-  const [description, setDescription] = useState("");
+  const [editName, setEditName] = useState(item?.name || "");
+  const [editIcon, setEditIcon] = useState(item?.icon || "Icons");
 
-  const addMainExpensesMutation = useMutation({
-    mutationFn: addExpense,
+  const editExpensesMutation = useMutation({
+    mutationFn: updateExpense,
     onSuccess: () => {
-      snackbar.showSuccess("Expense added.");
+      snackbar.showSuccess("Category (expenses) Updated.");
       queryClient.invalidateQueries({ queryKey: ["expenses"] });
-      setName("");
-      setAmount(0);
-      setCategory("Category");
-      setDescription("");
-      handleCloseMainDialog(false);
+      handleCloseCategoryEditDialog(true);
     },
     onError: (error) => {
       snackbar.showError(error.response.data.message);
     },
   });
 
-  const handleAddExpenses = () => {
-    if (!name || !amount || !category) {
+  const handleEditMain = () => {
+    if (!editName || editIcon === "Icons") {
       snackbar.showWarning("Please fill in the details.");
-    } else if (category === "Category") {
-      snackbar.showWarning("Please choose a Category.");
-    } else if (amount === 0) {
-      snackbar.showWarning("Amount cannot be zero");
     } else {
-      addMainExpensesMutation.mutate({
-        name,
-        amount,
-        description,
-        category,
+      editExpensesMutation.mutate({
+        _id: item._id,
+        name: editName,
+        icon: editIcon,
         token,
       });
     }
   };
 
   return (
-    <Dialog open={openMainDialog} onClose={handleCloseMainDialog}>
-      <DialogTitle>What did you Spend Today?</DialogTitle>
+    <Dialog
+      open={openCategoryEditDialog}
+      onClose={handleCloseCategoryEditDialog}
+    >
+      <DialogTitle>Edit Category</DialogTitle>
       <DialogContent>
         <TextField
-          placeholder="Expenses"
           variant="outlined"
-          fullWidth
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <TextField
-          placeholder="Description"
-          variant="outlined"
-          fullWidth
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-          sx={{ marginTop: "10px", marginBottom: "10px" }}
-        />
-        <TextField
-          placeholder="Amount"
-          type="number"
-          variant="outlined"
-          fullWidth
-          value={amount}
-          onChange={(e) => setAmount(e.target.value)}
+          sx={{ width: "100%", marginBottom: "10px" }}
+          value={editName}
+          onChange={(e) => setEditName(e.target.value)}
         />
         <Select
           labelId="icon-select-label"
           id="icon-select"
           fullWidth
-          value={category}
-          onChange={(e) => setCategory(e.target.value)}
+          value={editIcon}
+          onChange={(e) => setEditIcon(e.target.value)}
           sx={{ marginTop: "10px" }}
         >
-          <MenuItem value="Category">
-            <Typography>Category</Typography>
+          <MenuItem value="Icons">
+            <Typography>Icons</Typography>
           </MenuItem>
           <MenuItem value="Shopping">
             <ShoppingBagIcon />
@@ -145,12 +121,12 @@ export default function DialogMainAdd({
         <Button
           variant="contained"
           color="warning"
-          onClick={handleCloseMainDialog}
+          onClick={handleCloseCategoryEditDialog}
         >
           Cancel
         </Button>
-        <Button variant="contained" color="warning" onClick={handleAddExpenses}>
-          Add
+        <Button variant="contained" color="warning" onClick={handleEditMain}>
+          Edit
         </Button>
       </DialogActions>
     </Dialog>

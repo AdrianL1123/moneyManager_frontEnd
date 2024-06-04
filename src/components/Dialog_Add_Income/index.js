@@ -15,15 +15,79 @@ import TimelapseIcon from "@mui/icons-material/Timelapse";
 import PriceCheckIcon from "@mui/icons-material/PriceCheck";
 import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import { useCookies } from "react-cookie";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { addExpense } from "../../utils/api_expense";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
 import { addIncome } from "../../utils/api_income";
+import { getCategoriesIncome } from "../../utils/api_categoriesIncome";
 
 export default function DialogIncomeAdd({
   openIncomeDialog,
   handleCloseIncomeDialog,
 }) {
+  const today = new Date();
+  const currentDay = today.getDay();
+  const currentMonth = today.getMonth();
+  const currentDate = today.getDate();
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const date = [
+    "1st of",
+    "2nd of",
+    "3rd of",
+    "4th of",
+    "5th of",
+    "6th of",
+    "7th of",
+    "8th of",
+    "9th of",
+    "10th of",
+    "11th of",
+    "12th of",
+    "13th of",
+    "14th of",
+    "15th of",
+    "16th of",
+    "17th of",
+    "18th of",
+    "19th of",
+    "20th of",
+    "21st of",
+    "22nd of",
+    "23rd of",
+    "24th of",
+    "25th of",
+    "26th of",
+    "27th of",
+    "28th of",
+    "29th of",
+    "30th of",
+    "31st of",
+  ];
+  const currentDayName = days[currentDay];
+  const currentMonthName = months[currentMonth];
+  const currentDateName = date[currentDate];
+
   const snackbar = useCustomSnackbar();
   const queryClient = useQueryClient();
   const [cookies] = useCookies(["currentUser"]);
@@ -34,6 +98,25 @@ export default function DialogIncomeAdd({
   const [amount, setAmount] = useState(0);
   const [category, setCategory] = useState("Category");
   const [description, setDescription] = useState("");
+
+  const { data: categoriesIncomes = [] } = useQuery({
+    queryKey: ["categoriesIncome", token],
+    queryFn: () => getCategoriesIncome(token),
+  });
+  const getIconIncomeComponent = (iconNameIncome) => {
+    switch (iconNameIncome) {
+      case "Salary":
+        return <AttachMoneyIcon />;
+      case "Part-Time":
+        return <TimelapseIcon />;
+      case "Investments":
+        return <PriceCheckIcon />;
+      case "Bonus":
+        return <NewReleasesIcon />;
+      default:
+        return null;
+    }
+  };
 
   const addIncomeMutation = useMutation({
     mutationFn: addIncome,
@@ -56,7 +139,7 @@ export default function DialogIncomeAdd({
       snackbar.showWarning("Please fill in the details.");
     } else if (category === "Category") {
       snackbar.showWarning("Please choose a Category.");
-    } else if (amount === 0) {
+    } else if (amount <= 0) {
       snackbar.showWarning("Amount cannot be zero");
     } else {
       addIncomeMutation.mutate({
@@ -107,23 +190,20 @@ export default function DialogIncomeAdd({
           <MenuItem value="Category">
             <Typography>Category</Typography>
           </MenuItem>
-          <MenuItem value="Salary">
-            <AttachMoneyIcon />
-            <Typography>Salary</Typography>
-          </MenuItem>
-          <MenuItem value="Part-Time">
-            <TimelapseIcon />
-            <Typography>Part Time</Typography>
-          </MenuItem>
-          <MenuItem value="Investments">
-            <PriceCheckIcon />
-            <Typography>Investments</Typography>
-          </MenuItem>
-          <MenuItem value="Bonus">
-            <NewReleasesIcon />
-            <Typography>Bonus</Typography>
-          </MenuItem>
+          {categoriesIncomes.map((ci) => (
+            <MenuItem key={ci._id} value={ci._id}>
+              {getIconIncomeComponent(ci.icon)}
+              {ci.name}
+            </MenuItem>
+          ))}
         </Select>
+        <TextField
+          sx={{ paddingTop: "10px" }}
+          variant="outlined"
+          fullWidth
+          disabled
+          value={`${currentDateName} ${currentMonthName}, ${currentDayName}`}
+        />
       </DialogContent>
       <DialogActions sx={{ justifyContent: "center" }}>
         <Button

@@ -7,6 +7,7 @@ export const getExpenses = async (category) => {
   if (category !== "Category") params.category = category;
   const query = new URLSearchParams(params);
   const res = await axios.get(`${url}/expenses?${query.toString()}`);
+  console.log(res.data);
   return res.data;
 };
 

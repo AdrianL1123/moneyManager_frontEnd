@@ -6,6 +6,11 @@ export const getCategories = async () => {
   return response.data;
 };
 
+export const getCategory = async (id) => {
+  const res = await axios.get(`${url}/categories/${id}`);
+  return res.data;
+};
+
 export const addNewCategories = async (data) => {
   const response = await axios.post(`${url}/categories`, JSON.stringify(data), {
     headers: {

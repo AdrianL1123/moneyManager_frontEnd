@@ -20,9 +20,10 @@ import {
   ShoppingBag as ShoppingBagIcon,
 } from "@mui/icons-material";
 import { useCookies } from "react-cookie";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { updateExpense } from "../../utils/api_expense";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
+import { getCategories } from "../../utils/api_categories";
 
 export default function DialogCategoryEdit({
   openCategoryEditDialog,
@@ -35,6 +36,11 @@ export default function DialogCategoryEdit({
   const { currentUser = {} } = cookies;
   const { token } = currentUser;
 
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories", token],
+    queryFn: () => getCategories(token),
+  });
+
   const [editName, setEditName] = useState(item?.name || "");
   const [editIcon, setEditIcon] = useState(item?.icon || "Icons");
 
@@ -42,7 +48,7 @@ export default function DialogCategoryEdit({
     mutationFn: updateExpense,
     onSuccess: () => {
       snackbar.showSuccess("Category (expenses) Updated.");
-      queryClient.invalidateQueries({ queryKey: ["expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["categories"] });
       handleCloseCategoryEditDialog(true);
     },
     onError: (error) => {
@@ -68,7 +74,7 @@ export default function DialogCategoryEdit({
       open={openCategoryEditDialog}
       onClose={handleCloseCategoryEditDialog}
     >
-      <DialogTitle>Edit Category</DialogTitle>
+      <DialogTitle>Edit Category (expenses)</DialogTitle>
       <DialogContent>
         <TextField
           variant="outlined"

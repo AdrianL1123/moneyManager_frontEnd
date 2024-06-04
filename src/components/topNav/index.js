@@ -73,7 +73,6 @@ export default function TopNav() {
             </Typography>
             <Typography sx={{ margin: "0 10px" }}>Income:</Typography>
             <Typography sx={{ margin: "0 10px" }}>Expenses:</Typography>
-            <Typography sx={{ margin: "0 10px" }}>Balance:</Typography>
           </Box>
         </Toolbar>
       </AppBar>

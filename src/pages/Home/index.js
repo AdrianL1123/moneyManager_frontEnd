@@ -1,12 +1,11 @@
 import { useState } from "react";
 import { useCookies } from "react-cookie";
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import {
   Box,
   Button,
   Container,
   Divider,
-  MenuItem,
   Table,
   TableBody,
   TableCell,
@@ -19,7 +18,6 @@ import PriceCheckIcon from "@mui/icons-material/PriceCheck";
 import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import TimelapseIcon from "@mui/icons-material/Timelapse";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
-
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import EmojiTransportationIcon from "@mui/icons-material/EmojiTransportation";
@@ -33,79 +31,34 @@ import BottomNav from "../../components/bottomNav";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
 import { getExpenses } from "../../utils/api_expense";
 import { getIncomes } from "../../utils/api_income";
-import { getCategories } from "../../utils/api_categories";
 import DialogMainAdd from "../../components/Dialog_MainAdd";
-import { getCategoriesIncome } from "../../utils/api_categoriesIncome";
 import DialogIncomeAdd from "../../components/Dialog_Add_Income";
 
 export default function Home() {
-  // const queryClient = useQueryClient();
-  // const snackbar = useCustomSnackbar();
-
-  //expenses
   const [openMainDialog, setOpenMainDialog] = useState(false);
   const handleOpenMainDialog = () => setOpenMainDialog(true);
   const handleCloseMainDialog = () => setOpenMainDialog(false);
-  //expenses
 
-  // Income
   const [openIncomeDialog, setOpenIncomeDialog] = useState(false);
   const handleOpenIncomeDialog = () => setOpenIncomeDialog(true);
   const handleCloseIncomeDialog = () => setOpenIncomeDialog(false);
-  // Income
+
+  const [category, setCategory] = useState("Category");
 
   const [cookies] = useCookies(["currentUser"]);
   const { currentUser = {} } = cookies;
   const { token } = currentUser;
 
   const { data: expenses = [] } = useQuery({
-    queryKey: ["expenses", token],
-    queryFn: () => getExpenses(token),
+    queryKey: ["expenses", category, token],
+    queryFn: () => getExpenses(category, token),
   });
+  console.log(expenses);
 
   const { data: incomes = [] } = useQuery({
-    queryKey: ["incomes", token],
-    queryFn: () => getIncomes(token),
+    queryKey: ["incomes", category, token],
+    queryFn: () => getIncomes(category, token),
   });
-
-  // const { data: categoriesIncome = [] } = useQuery({
-  //   queryKey: ["categoriesIncome", token],
-  //   queryFn: () => getCategoriesIncome(token),
-  // });
-
-  // const { data: categories = [] } = useQuery({
-  //   queryKey: ["categories", token],
-  //   queryFn: () => getCategories(token),
-  // });
-
-  const today = new Date();
-  const currentDay = today.getDay();
-  const currentMonth = today.getMonth();
-  const days = [
-    "Sunday",
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-  ];
-  const months = [
-    "January",
-    "February",
-    "March",
-    "April",
-    "May",
-    "June",
-    "July",
-    "August",
-    "September",
-    "October",
-    "November",
-    "December",
-  ];
-  const currentDayName = days[currentDay];
-  const currentMonthName = months[currentMonth];
 
   const getIconComponent = (iconName) => {
     switch (iconName) {
@@ -203,65 +156,118 @@ export default function Home() {
             flexDirection: "column",
           }}
         >
-          {expenses.length > 0 || incomes.length > 0 ? (
-            <TableContainer sx={{ maxWidth: "100%", width: "100%" }}>
+          {expenses.length > 0 ? (
+            <TableContainer
+              sx={{ maxWidth: "100%", width: "100%", marginBottom: "20px" }}
+            >
+              <Typography align="center" variant="h6" sx={{ color: "white" }}>
+                Expenses
+              </Typography>
               <Table>
-                <TableHead>
-                  <TableRow>
-                    <TableCell width={"5%"} sx={{ color: "white" }}>
-                      {currentMonthName}
-                    </TableCell>
-                    <TableCell align="left" sx={{ color: "white" }}>
-                      {currentDayName}
-                    </TableCell>
-                    <TableCell
-                      align="right"
-                      sx={{ color: "white" }}
-                    ></TableCell>
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  {expenses.map((expense) => (
-                    <TableRow key={expense._id}>
-                      <TableCell width={"20%"} sx={{ color: "white" }}>
-                        {getIconComponent(expense.category.name)}
-                      </TableCell>
-                      <TableCell align="left" sx={{ color: "white" }}>
-                        {expense.name}
-                      </TableCell>
-                      <TableCell align="right" sx={{ color: "white" }}>
-                        {expense.amount}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                  {incomes.map((income) => (
-                    <TableRow key={income._id}>
-                      <TableCell width={"20%"} sx={{ color: "white" }}>
-                        {getIconComponent(income.category.name)}
-                      </TableCell>
-                      <TableCell align="left" sx={{ color: "white" }}>
-                        {income.name}
-                      </TableCell>
-                      <TableCell align="right" sx={{ color: "white" }}>
-                        {income.amount}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
+                {expenses.map((expense) => (
+                  <>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ color: "gray", width: "30%" }}>
+                          {expense.created_at.split("T")[0]}
+                        </TableCell>
+                        <TableCell align="left" sx={{ color: "white" }}>
+                          Name
+                        </TableCell>
+                        <TableCell align="center" sx={{ color: "white" }}>
+                          Amount
+                        </TableCell>
+                        <TableCell align="right" sx={{ color: "white" }}>
+                          Actions
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow key={expense._id}>
+                        <TableCell sx={{ color: "white", width: "30%" }}>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            {getIconComponent(expense.category.name)}
+                            <Box sx={{ margin: "5px" }}>
+                              {expense.category.name}
+                            </Box>
+                          </Box>
+                        </TableCell>
+                        <TableCell align="left" sx={{ color: "white" }}>
+                          {expense.name}
+                        </TableCell>
+                        <TableCell align="center" sx={{ color: "white" }}>
+                          {`$${expense.amount}`}
+                        </TableCell>
+                        <TableCell align="right" sx={{ color: "white" }}>
+                          <Button>Edit</Button>
+                          <Button>Delete</Button>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </>
+                ))}
               </Table>
             </TableContainer>
           ) : (
-            <Container
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                flexDirection: "column",
-              }}
-            >
-              <Typography align="center" variant="h4" sx={{ color: "white" }}>
-                No Expenses/Income added yet.
+            <Typography align="center" variant="h6" sx={{ color: "white" }}>
+              No Expenses added yet.
+            </Typography>
+          )}
+
+          {incomes.length > 0 ? (
+            <TableContainer sx={{ maxWidth: "100%", width: "100%" }}>
+              <Typography align="center" variant="h6" sx={{ color: "white" }}>
+                Incomes
               </Typography>
-            </Container>
+              <Table>
+                {incomes.map((income) => (
+                  <>
+                    <TableHead>
+                      <TableRow>
+                        <TableCell sx={{ color: "gray", width: "30%" }}>
+                          {income.created_at.split("T")[0]}
+                        </TableCell>
+                        <TableCell align="left" sx={{ color: "white" }}>
+                          Name
+                        </TableCell>
+                        <TableCell align="center" sx={{ color: "white" }}>
+                          Amount
+                        </TableCell>
+                        <TableCell align="right" sx={{ color: "white" }}>
+                          Actions
+                        </TableCell>
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow key={income._id}>
+                        <TableCell sx={{ color: "white", width: "30%" }}>
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            {getIconIncomeComponent(income.category.icon)}
+                            <Box sx={{ margin: "5px" }}>
+                              {income.category.name}
+                            </Box>
+                          </Box>
+                        </TableCell>
+                        <TableCell align="left" sx={{ color: "white" }}>
+                          {income.name}
+                        </TableCell>
+                        <TableCell align="center" sx={{ color: "white" }}>
+                          {`$${income.amount}`}
+                        </TableCell>
+                        <TableCell align="right" sx={{ color: "white" }}>
+                          <Button>Edit</Button>
+                          <Button>Delete</Button>
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </>
+                ))}
+              </Table>
+            </TableContainer>
+          ) : (
+            <Typography align="center" variant="h6" sx={{ color: "white" }}>
+              No Income added yet.
+            </Typography>
           )}
         </Container>
       </Container>

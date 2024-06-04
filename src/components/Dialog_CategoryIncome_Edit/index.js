@@ -15,9 +15,12 @@ import PriceCheckIcon from "@mui/icons-material/PriceCheck";
 import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { useCookies } from "react-cookie";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
-import { updateCategoryIncome } from "../../utils/api_categoriesIncome";
+import {
+  getCategoriesIncome,
+  updateCategoryIncome,
+} from "../../utils/api_categoriesIncome";
 
 export default function DialogCategoryIncomeEdit({
   openCategoryIncomeEditDialog,
@@ -30,6 +33,11 @@ export default function DialogCategoryIncomeEdit({
   const { currentUser = {} } = cookies;
   const { token } = currentUser;
 
+  const { data: categoriesIncome = [] } = useQuery({
+    queryKey: ["categoriesIncome", token],
+    queryFn: () => getCategoriesIncome(token),
+  });
+
   const [editName, setEditName] = useState(item?.name || "");
   const [editIcon, setEditIcon] = useState(item?.icon || "Icons");
 
@@ -37,7 +45,7 @@ export default function DialogCategoryIncomeEdit({
     mutationFn: updateCategoryIncome,
     onSuccess: () => {
       snackbar.showSuccess("Category (income) Updated.");
-      queryClient.invalidateQueries({ queryKey: ["incomes"] });
+      queryClient.invalidateQueries({ queryKey: ["categoriesIncome"] });
       handleCloseCategoryIncomeEditDialog();
     },
     onError: (error) => {

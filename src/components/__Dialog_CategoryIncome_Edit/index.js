@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Button,
   MenuItem,
@@ -15,17 +15,15 @@ import PriceCheckIcon from "@mui/icons-material/PriceCheck";
 import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
 import { useCookies } from "react-cookie";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
-import {
-  getCategoriesIncome,
-  updateCategoryIncome,
-} from "../../utils/api_categoriesIncome";
+import { updateCategoryIncome } from "../../utils/api_categoriesIncome";
+import { getIncome } from "../../utils/api_income";
 
 export default function DialogCategoryIncomeEdit({
   openCategoryIncomeEditDialog,
   handleCloseCategoryIncomeEditDialog,
-  item,
+  id,
 }) {
   const snackbar = useCustomSnackbar();
   const queryClient = useQueryClient();
@@ -33,13 +31,21 @@ export default function DialogCategoryIncomeEdit({
   const { currentUser = {} } = cookies;
   const { token } = currentUser;
 
-  const { data: categoriesIncome = [] } = useQuery({
-    queryKey: ["categoriesIncome", token],
-    queryFn: () => getCategoriesIncome(token),
+  const [editName, setEditName] = useState("");
+  const [editIcon, setEditIcon] = useState("Icons");
+
+  // Fetch income data
+  const { data: income } = useQuery({
+    queryKey: ["income", id],
+    queryFn: () => getIncome(id),
   });
 
-  const [editName, setEditName] = useState(item?.name || "");
-  const [editIcon, setEditIcon] = useState(item?.icon || "Icons");
+  useEffect(() => {
+    if (income) {
+      setEditName(income.name);
+      setEditIcon(income.icon);
+    }
+  }, [income]);
 
   const editIncomesMutation = useMutation({
     mutationFn: updateCategoryIncome,
@@ -54,11 +60,11 @@ export default function DialogCategoryIncomeEdit({
   });
 
   const handleEditIncome = () => {
-    if (!editName || editIcon === "Icons") {
+    if (editName === "" || editIcon === "Icons") {
       snackbar.showWarning("Please fill in the details.");
     } else {
       editIncomesMutation.mutate({
-        _id: item._id,
+        _id: id,
         name: editName,
         icon: editIcon,
         token,
@@ -75,7 +81,8 @@ export default function DialogCategoryIncomeEdit({
       <DialogContent>
         <TextField
           variant="outlined"
-          sx={{ width: "100%", marginBottom: "10px" }}
+          fullWidth
+          margin="normal"
           value={editName}
           onChange={(e) => setEditName(e.target.value)}
         />
@@ -85,7 +92,7 @@ export default function DialogCategoryIncomeEdit({
           fullWidth
           value={editIcon}
           onChange={(e) => setEditIcon(e.target.value)}
-          sx={{ marginTop: "10px" }}
+          margin="normal"
         >
           <MenuItem value="Icons">
             <Typography>Icons</Typography>
@@ -96,7 +103,7 @@ export default function DialogCategoryIncomeEdit({
           </MenuItem>
           <MenuItem value="Part-Time">
             <TimelapseIcon />
-            <Typography>Part Time</Typography>
+            <Typography>Part-Time</Typography>
           </MenuItem>
           <MenuItem value="Investments">
             <PriceCheckIcon />

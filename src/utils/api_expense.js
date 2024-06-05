@@ -2,9 +2,10 @@ import axios from "axios";
 
 import { url } from "./data";
 
-export const getExpenses = async (category) => {
+export const getExpenses = async (category, token) => {
   let params = {};
   if (category !== "Category") params.category = category;
+  // urlsearchparams class is to turn object to key value string
   const query = new URLSearchParams(params);
   const res = await axios.get(`${url}/expenses?${query.toString()}`);
   console.log(res.data);

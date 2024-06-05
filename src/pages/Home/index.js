@@ -6,18 +6,19 @@ import {
   Button,
   Container,
   Divider,
+  InputAdornment,
+  MenuItem,
+  Select,
   Table,
   TableBody,
   TableCell,
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Typography,
 } from "@mui/material";
-import PriceCheckIcon from "@mui/icons-material/PriceCheck";
-import NewReleasesIcon from "@mui/icons-material/NewReleases";
-import TimelapseIcon from "@mui/icons-material/Timelapse";
-import AttachMoneyIcon from "@mui/icons-material/AttachMoney";
+import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
 import EmojiTransportationIcon from "@mui/icons-material/EmojiTransportation";
@@ -30,34 +31,28 @@ import TopNav from "../../components/topNav";
 import BottomNav from "../../components/bottomNav";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
 import { getExpenses } from "../../utils/api_expense";
-import { getIncomes } from "../../utils/api_income";
 import DialogMainAdd from "../../components/Dialog_MainAdd";
-import DialogIncomeAdd from "../../components/Dialog_Add_Income";
+import { getCategories } from "../../utils/api_categories";
 
 export default function Home() {
   const [openMainDialog, setOpenMainDialog] = useState(false);
   const handleOpenMainDialog = () => setOpenMainDialog(true);
   const handleCloseMainDialog = () => setOpenMainDialog(false);
 
-  const [openIncomeDialog, setOpenIncomeDialog] = useState(false);
-  const handleOpenIncomeDialog = () => setOpenIncomeDialog(true);
-  const handleCloseIncomeDialog = () => setOpenIncomeDialog(false);
-
   const [category, setCategory] = useState("Category");
 
   const [cookies] = useCookies(["currentUser"]);
   const { currentUser = {} } = cookies;
-  const { token } = currentUser;
+  const { token, _id } = currentUser;
 
   const { data: expenses = [] } = useQuery({
     queryKey: ["expenses", category, token],
     queryFn: () => getExpenses(category, token),
   });
-  console.log(expenses);
 
-  const { data: incomes = [] } = useQuery({
-    queryKey: ["incomes", category, token],
-    queryFn: () => getIncomes(category, token),
+  const { data: categories = [] } = useQuery({
+    queryKey: ["categories"],
+    queryFn: () => getCategories(),
   });
 
   const getIconComponent = (iconName) => {
@@ -81,21 +76,6 @@ export default function Home() {
     }
   };
 
-  const getIconIncomeComponent = (iconNameIncome) => {
-    switch (iconNameIncome) {
-      case "Salary":
-        return <AttachMoneyIcon />;
-      case "Part-Time":
-        return <TimelapseIcon />;
-      case "Investments":
-        return <PriceCheckIcon />;
-      case "Bonus":
-        return <NewReleasesIcon />;
-      default:
-        return null;
-    }
-  };
-
   return (
     <>
       <TopNav />
@@ -109,44 +89,11 @@ export default function Home() {
           flexDirection: "column",
         }}
       >
-        <Box sx={{ display: "flex", padding: "20px" }}>
-          <Button
-            endIcon={<AddCircleIcon />}
-            color="warning"
-            onClick={handleOpenMainDialog}
-            sx={{ justifyContent: "center", color: "#FEE12B" }}
-          >
-            Add Expenses
-          </Button>
-          <Divider
-            sx={{
-              borderColor: "#FEE12B",
-              height: "30px",
-              margin: "auto",
-            }}
-            orientation="vertical"
-            variant="middle"
-            flexItem
-          />
-          <Button
-            endIcon={<AddCircleIcon />}
-            color="warning"
-            onClick={handleOpenIncomeDialog}
-            sx={{ justifyContent: "center", color: "#FEE12B" }}
-          >
-            Add Income
-          </Button>
-        </Box>
-
         <DialogMainAdd
           openMainDialog={openMainDialog}
           handleCloseMainDialog={handleCloseMainDialog}
         />
 
-        <DialogIncomeAdd
-          openIncomeDialog={openIncomeDialog}
-          handleCloseIncomeDialog={handleCloseIncomeDialog}
-        />
         <Container
           sx={{
             display: "flex",
@@ -156,25 +103,80 @@ export default function Home() {
             flexDirection: "column",
           }}
         >
-          {expenses.length > 0 ? (
-            <TableContainer
-              sx={{ maxWidth: "100%", width: "100%", marginBottom: "20px" }}
+          <Typography
+            align="center"
+            variant="h4"
+            sx={{
+              color: "#FEE12B",
+              paddingBottom: "10px",
+              fontWeight: 900,
+            }}
+          >
+            Expenses
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              gap: 2,
+            }}
+          >
+            <TextField
+              sx={{ backgroundColor: "#FEE12B", borderRadius: "4px" }}
+              focused
+              placeholder="Search by name"
+              InputProps={{
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <ManageSearchIcon sx={{ color: "white" }} />
+                  </InputAdornment>
+                ),
+              }}
+            />
+            <Select
+              value={category._id}
+              sx={{ backgroundColor: "#FEE12B", borderRadius: "4px" }}
+              onChange={(e) => {
+                setCategory(e.target.value);
+              }}
             >
-              <Typography align="center" variant="h6" sx={{ color: "white" }}>
-                Expenses
-              </Typography>
-              <Table>
-                {expenses.map((expense) => (
+              <MenuItem value="Category">All Types</MenuItem>
+              {categories.map((c) => (
+                <MenuItem key={c._id} value={c._id}>
+                  {c.name}
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
+          <Divider
+            sx={{
+              borderColor: "white",
+              width: "350px",
+              paddingTop: "10px",
+            }}
+          />
+          {expenses.length > 0 ? (
+            <>
+              <TableContainer
+                sx={{ maxWidth: "100%", width: "100%", marginBottom: "20px" }}
+              >
+                <Table>
                   <>
                     <TableHead>
                       <TableRow>
-                        <TableCell sx={{ color: "gray", width: "30%" }}>
-                          {expense.created_at.split("T")[0]}
+                        <TableCell
+                          align="left"
+                          sx={{ color: "white", width: "23%" }}
+                        >
+                          Date
+                        </TableCell>
+                        <TableCell align="left" sx={{ color: "white" }}>
+                          Type
                         </TableCell>
                         <TableCell align="left" sx={{ color: "white" }}>
                           Name
                         </TableCell>
-                        <TableCell align="center" sx={{ color: "white" }}>
+                        <TableCell align="right" sx={{ color: "white" }}>
                           Amount
                         </TableCell>
                         <TableCell align="right" sx={{ color: "white" }}>
@@ -183,94 +185,65 @@ export default function Home() {
                       </TableRow>
                     </TableHead>
                     <TableBody>
-                      <TableRow key={expense._id}>
-                        <TableCell sx={{ color: "white", width: "30%" }}>
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            {getIconComponent(expense.category.name)}
-                            <Box sx={{ margin: "5px" }}>
-                              {expense.category.name}
-                            </Box>
-                          </Box>
-                        </TableCell>
-                        <TableCell align="left" sx={{ color: "white" }}>
-                          {expense.name}
-                        </TableCell>
-                        <TableCell align="center" sx={{ color: "white" }}>
-                          {`$${expense.amount}`}
-                        </TableCell>
-                        <TableCell align="right" sx={{ color: "white" }}>
-                          <Button>Edit</Button>
-                          <Button>Delete</Button>
-                        </TableCell>
-                      </TableRow>
+                      {expenses
+                        .filter((expense) => expense.user_id === _id)
+                        .map((expense) => (
+                          <TableRow key={expense._id}>
+                            <TableCell align="left" sx={{ color: "gray" }}>
+                              {expense.created_at.split("T")[0]}
+                            </TableCell>
+                            <TableCell
+                              align="left"
+                              sx={{ color: "white", width: "20%" }}
+                            >
+                              <Box
+                                sx={{ display: "flex", alignItems: "center" }}
+                              >
+                                {getIconComponent(expense.category.name)}
+                                <Box sx={{ margin: "5px" }}>
+                                  {expense.category.name}
+                                </Box>
+                              </Box>
+                            </TableCell>
+                            <TableCell align="left" sx={{ color: "white" }}>
+                              {expense.name}
+                            </TableCell>
+                            <TableCell align="right" sx={{ color: "white" }}>
+                              {`$${expense.amount}`}
+                            </TableCell>
+                            <TableCell align="right" sx={{ color: "white" }}>
+                              <Button sx={{ color: "#FEE12B" }}>Edit</Button>
+                              <Button sx={{ color: "#FEE12B" }}>Delete</Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
                     </TableBody>
                   </>
-                ))}
-              </Table>
-            </TableContainer>
+                </Table>
+              </TableContainer>
+            </>
           ) : (
-            <Typography align="center" variant="h6" sx={{ color: "white" }}>
+            <Typography
+              align="center"
+              variant="h6"
+              sx={{ color: "white", paddingTop: "20px" }}
+            >
               No Expenses added yet.
-            </Typography>
-          )}
-
-          {incomes.length > 0 ? (
-            <TableContainer sx={{ maxWidth: "100%", width: "100%" }}>
-              <Typography align="center" variant="h6" sx={{ color: "white" }}>
-                Incomes
-              </Typography>
-              <Table>
-                {incomes.map((income) => (
-                  <>
-                    <TableHead>
-                      <TableRow>
-                        <TableCell sx={{ color: "gray", width: "30%" }}>
-                          {income.created_at.split("T")[0]}
-                        </TableCell>
-                        <TableCell align="left" sx={{ color: "white" }}>
-                          Name
-                        </TableCell>
-                        <TableCell align="center" sx={{ color: "white" }}>
-                          Amount
-                        </TableCell>
-                        <TableCell align="right" sx={{ color: "white" }}>
-                          Actions
-                        </TableCell>
-                      </TableRow>
-                    </TableHead>
-                    <TableBody>
-                      <TableRow key={income._id}>
-                        <TableCell sx={{ color: "white", width: "30%" }}>
-                          <Box sx={{ display: "flex", alignItems: "center" }}>
-                            {getIconIncomeComponent(income.category.icon)}
-                            <Box sx={{ margin: "5px" }}>
-                              {income.category.name}
-                            </Box>
-                          </Box>
-                        </TableCell>
-                        <TableCell align="left" sx={{ color: "white" }}>
-                          {income.name}
-                        </TableCell>
-                        <TableCell align="center" sx={{ color: "white" }}>
-                          {`$${income.amount}`}
-                        </TableCell>
-                        <TableCell align="right" sx={{ color: "white" }}>
-                          <Button>Edit</Button>
-                          <Button>Delete</Button>
-                        </TableCell>
-                      </TableRow>
-                    </TableBody>
-                  </>
-                ))}
-              </Table>
-            </TableContainer>
-          ) : (
-            <Typography align="center" variant="h6" sx={{ color: "white" }}>
-              No Income added yet.
             </Typography>
           )}
         </Container>
       </Container>
+
+      <Box sx={{ display: "flex", justifyContent: "center", padding: "20px" }}>
+        <Button
+          endIcon={<AddCircleIcon />}
+          color="warning"
+          onClick={handleOpenMainDialog}
+          sx={{ justifyContent: "center", color: "#FEE12B" }}
+        >
+          Add Expenses
+        </Button>
+      </Box>
       <BottomNav />
     </>
   );

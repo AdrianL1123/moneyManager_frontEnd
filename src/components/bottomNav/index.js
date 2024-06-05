@@ -11,6 +11,8 @@ import { useNavigate, useLocation } from "react-router-dom";
 import HomeIcon from "@mui/icons-material/Home";
 import CategoryIcon from "@mui/icons-material/Category";
 import ReceiptIcon from "@mui/icons-material/Receipt";
+import MoneyIcon from "@mui/icons-material/Money";
+import PaidIcon from "@mui/icons-material/Paid";
 
 export default function BottomNav() {
   const location = useLocation();
@@ -47,25 +49,12 @@ export default function BottomNav() {
           disableRipple
           component={Link}
           to="/"
-          label="Home"
-          icon={<HomeIcon />}
+          label="Expenses"
+          icon={<MoneyIcon />}
           sx={{
             color: "white",
           }}
         />
-        {/* {location.pathname === "/" ? (
-          <BottomNavigationAction
-            disableTouchRipple
-            disableRipple
-            component={Link}
-            to="/new"
-            icon={<AddCircleIcon sx={{ fontSize: 40 }} />}
-            sx={{
-              color: "#FEE12B",
-            }}
-          />
-        ) : null} */}
-
         <BottomNavigationAction
           disableTouchRipple
           disableRipple
@@ -81,6 +70,18 @@ export default function BottomNav() {
         <BottomNavigationAction
           disableTouchRipple
           disableRipple
+          component={Link}
+          to="/income"
+          label="Income"
+          icon={<PaidIcon />}
+          sx={{
+            color: "white",
+          }}
+        />
+
+        {/* <BottomNavigationAction
+          disableTouchRipple
+          disableRipple
           label="Transactions"
           icon={<ReceiptIcon />}
           sx={{
@@ -89,7 +90,7 @@ export default function BottomNav() {
           onClick={() => {
             navigate("/");
           }}
-        />
+        /> */}
         <BottomNavigationAction
           disableTouchRipple
           disableRipple

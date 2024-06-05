@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Button,
   MenuItem,
@@ -20,10 +20,9 @@ import {
   ShoppingBag as ShoppingBagIcon,
 } from "@mui/icons-material";
 import { useCookies } from "react-cookie";
-import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { updateExpense } from "../../utils/api_expense";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
-import { getCategories } from "../../utils/api_categories";
+import { updateCategory } from "../../utils/api_categories";
 
 export default function DialogCategoryEdit({
   openCategoryEditDialog,
@@ -36,18 +35,13 @@ export default function DialogCategoryEdit({
   const { currentUser = {} } = cookies;
   const { token } = currentUser;
 
-  const { data: categories = [] } = useQuery({
-    queryKey: ["categories", token],
-    queryFn: () => getCategories(token),
-  });
-
   const [editName, setEditName] = useState(item?.name || "");
   const [editIcon, setEditIcon] = useState(item?.icon || "Icons");
 
   const editExpensesMutation = useMutation({
-    mutationFn: updateExpense,
+    mutationFn: updateCategory,
     onSuccess: () => {
-      snackbar.showSuccess("Category (expenses) Updated.");
+      snackbar.showSuccess("Category (Expenses) Updated.");
       queryClient.invalidateQueries({ queryKey: ["categories"] });
       handleCloseCategoryEditDialog(true);
     },

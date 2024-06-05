@@ -12,6 +12,8 @@ import Profile from "./pages/Profile";
 import CategoryIncome from "./pages/CategoriesIncome";
 import { SnackbarProvider } from "material-ui-snackbar-provider"; // Ensure this package is installed and imported correctly
 import CustomSnackbar from "./components/CustomSnackbar";
+import Income from "./pages/Income";
+import IncomeEdit from "./pages/IncomeEdit";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +28,8 @@ export default function App() {
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/income" element={<Income />} />
+              <Route path="/incomeEdit/:id" element={<IncomeEdit />} />
               <Route path="/profile" element={<Profile />} />
               <Route path="/login" element={<Login />} />
               <Route path="/signup" element={<SignUp />} />

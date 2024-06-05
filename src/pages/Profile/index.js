@@ -71,6 +71,7 @@ export default function Profile() {
               alignItems: "center",
               justifyContent: "center",
               paddingTop: "20px",
+              width: "auto",
             }}
           >
             <Button
@@ -79,7 +80,7 @@ export default function Profile() {
                 padding: "10px",
                 border: "2px solid",
                 borderRadius: "10px",
-                width: "700px",
+                minWidth: "70%",
                 height: "auto",
                 display: "flex",
                 justifyContent: "center",
@@ -140,6 +141,7 @@ export default function Profile() {
                   alignItems: "center",
                   flexDirection: "column",
                   backgroundColor: "#333333",
+                  minWidth: "70%",
                 }}
                 onClick={() => {
                   navigate("/login");
@@ -191,6 +193,7 @@ export default function Profile() {
                   alignItems: "center",
                   flexDirection: "column",
                   backgroundColor: "#333333",
+                  minWidth: "70%",
                 }}
                 onClick={() => {
                   navigate("/signup");

@@ -10,6 +10,13 @@ import {
   TableCell,
   TableBody,
   Button,
+  DialogActions,
+  Select,
+  TextField,
+  DialogContent,
+  DialogTitle,
+  Dialog,
+  MenuItem,
 } from "@mui/material";
 import ShoppingBagIcon from "@mui/icons-material/ShoppingBag";
 import RestaurantIcon from "@mui/icons-material/Restaurant";
@@ -22,12 +29,11 @@ import { useCookies } from "react-cookie";
 import PlaylistAddIcon from "@mui/icons-material/PlaylistAdd";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getCategories } from "../../utils/api_categories";
+import { getCategories, updateCategory } from "../../utils/api_categories";
 import DialogCategoryAdd from "../../components/Dialog_Category_Add";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteCategory } from "../../utils/api_categories";
-import DialogCategoryEdit from "../../components/Dialog_Category_Edit";
 
 export default function Categories() {
   const queryClient = useQueryClient();
@@ -42,19 +48,6 @@ export default function Categories() {
     setOpenDialog(false);
   };
 
-  // Edit category dialog state
-  const [openEditDialog, setOpenEditDialog] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-
-  const handleOpenEditDialog = (category) => {
-    setSelectedCategory(category);
-    setOpenEditDialog(true);
-  };
-  const handleCloseEditDialog = () => {
-    setOpenEditDialog(false);
-    setSelectedCategory(null);
-  };
-
   const [cookies] = useCookies(["currentUser"]);
   const { currentUser = {} } = cookies;
   const { role, token } = currentUser;
@@ -63,6 +56,15 @@ export default function Categories() {
     queryKey: ["categories", token],
     queryFn: () => getCategories(token),
   });
+
+  //to open edit dialog
+  const [openEditModal, setOpenEditModal] = useState(false);
+  //states for edit
+  const [editName, setEditName] = useState("");
+  const [editNameID, setEditNameID] = useState("");
+
+  const [editIcon, setEditIcon] = useState("");
+  const [editIconID, setEditIconID] = useState("");
 
   const getIconComponent = (iconName) => {
     switch (iconName) {
@@ -107,6 +109,31 @@ export default function Categories() {
     }
   };
 
+  const updateCategoryMutation = useMutation({
+    mutationFn: updateCategory,
+    onSuccess: () => {
+      snackbar.showSuccess("Category has been updated successfully.");
+      queryClient.invalidateQueries(["categories"]);
+      setOpenEditModal(false);
+    },
+    onError: (error) => {
+      snackbar.showError(error.response.data.message);
+    },
+  });
+
+  const handleEdit = () => {
+    if (editName === "" || editIcon === "") {
+      snackbar.showWarning("Please fill in the details.");
+    } else {
+      updateCategoryMutation.mutate({
+        _id: editNameID,
+        name: editName,
+        icon: editIcon,
+        token: token,
+      });
+    }
+  };
+
   return (
     <>
       <Container style={{ paddingTop: "20px", width: "100%" }}>
@@ -135,6 +162,7 @@ export default function Categories() {
           >
             Add A Category
           </Button>
+
           <DialogCategoryAdd
             openDialog={openDialog}
             handleCloseDialog={handleCloseDialog}
@@ -168,7 +196,13 @@ export default function Categories() {
                       <TableCell align="right" sx={{ color: "white" }}>
                         <Button
                           sx={{ color: "#FEE12B" }}
-                          onClick={() => handleOpenEditDialog(c)}
+                          onClick={() => {
+                            setOpenEditModal(true);
+                            setEditName(c.name);
+                            setEditNameID(c._id);
+                            setEditIcon(c.icon);
+                            setEditIconID(c._id);
+                          }}
                         >
                           Edit
                         </Button>
@@ -197,15 +231,72 @@ export default function Categories() {
           </TableContainer>
         </Container>
       </Container>
-
-      {selectedCategory && (
-        <DialogCategoryEdit
-          openCategoryEditDialog={openEditDialog}
-          handleCloseCategoryEditDialog={handleCloseEditDialog}
-          item={selectedCategory}
-        />
-      )}
-
+      <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
+        <DialogTitle>Edit Category For Expenses</DialogTitle>
+        <DialogContent>
+          <TextField
+            placeholder="Category"
+            variant="outlined"
+            fullWidth
+            sx={{ marginBottom: "10px" }}
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+          />
+          <Select
+            labelId="icon-select-label"
+            id="icon-select"
+            fullWidth
+            value={editIcon}
+            onChange={(e) => setEditIcon(e.target.value)}
+            sx={{ marginTop: "10px" }}
+          >
+            <MenuItem value="Shopping">
+              <ShoppingBagIcon />
+              <Typography>Shopping</Typography>
+            </MenuItem>
+            <MenuItem value="Food">
+              <RestaurantIcon />
+              <Typography>Food</Typography>
+            </MenuItem>
+            <MenuItem value="Transportation">
+              <EmojiTransportationIcon />
+              <Typography>Transportation</Typography>
+            </MenuItem>
+            <MenuItem value="Entertainment">
+              <SportsEsportsIcon />
+              <Typography>Entertainment</Typography>
+            </MenuItem>
+            <MenuItem value="Pet">
+              <PetsIcon />
+              <Typography>Pet</Typography>
+            </MenuItem>
+            <MenuItem value="Health">
+              <FavoriteIcon />
+              <Typography>Health</Typography>
+            </MenuItem>
+            <MenuItem value="Gift">
+              <CardGiftcardIcon />
+              <Typography>Gift</Typography>
+            </MenuItem>
+          </Select>
+        </DialogContent>
+        <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => setOpenEditModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => handleEdit()}
+          >
+            Edit
+          </Button>
+        </DialogActions>
+      </Dialog>
       <BottomNav />
     </>
   );

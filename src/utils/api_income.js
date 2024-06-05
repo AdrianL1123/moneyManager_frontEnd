@@ -2,13 +2,11 @@ import axios from "axios";
 
 import { url } from "./data";
 
-export const getIncomes = async (categoryIncome) => {
+export const getIncomes = async (category, token) => {
   let params = {};
-  if (categoryIncome !== "categoryIncome")
-    params.categoryIncome = categoryIncome;
+  if (category !== "Category") params.category = category;
   const query = new URLSearchParams(params);
   const res = await axios.get(`${url}/incomes?${query.toString()}`);
-  console.log(res.data);
   return res.data;
 };
 

@@ -140,7 +140,7 @@ export default function DialogIncomeAdd({
     } else if (category === "Category") {
       snackbar.showWarning("Please choose a Category.");
     } else if (amount <= 0) {
-      snackbar.showWarning("Amount cannot be zero");
+      snackbar.showWarning("Amount cannot be less than zero");
     } else {
       addIncomeMutation.mutate({
         name,

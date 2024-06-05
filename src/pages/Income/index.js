@@ -5,6 +5,10 @@ import {
   Box,
   Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   InputAdornment,
   MenuItem,
@@ -21,7 +25,7 @@ import {
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import TopNav from "../../components/topNav";
 import DialogIncomeAdd from "../../components/Dialog_Add_Income";
-import { getIncomes } from "../../utils/api_income";
+import { deleteIncome, getIncomes } from "../../utils/api_income";
 import PriceCheckIcon from "@mui/icons-material/PriceCheck";
 import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import TimelapseIcon from "@mui/icons-material/Timelapse";
@@ -30,9 +34,15 @@ import BottomNav from "../../components/bottomNav";
 import { getCategoriesIncome } from "../../utils/api_categoriesIncome";
 import ManageSearchIcon from "@mui/icons-material/ManageSearch";
 import { useNavigate } from "react-router-dom";
+import useCustomSnackbar from "../../components/useCustomSnackbar";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Income() {
+  const queryClient = useQueryClient();
+  const snackbar = useCustomSnackbar();
+
   const navigate = useNavigate();
+
   const [cookies] = useCookies(["currentUser"]);
   const { currentUser = {} } = cookies;
   const { token, _id } = currentUser;
@@ -47,6 +57,30 @@ export default function Income() {
     queryKey: ["categoriesIncome"],
     queryFn: () => getCategoriesIncome(),
   });
+
+  //to open delete dialog
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  // use state here cuz when user press in i put in the argument as income_id if not is null
+  const [selectedIncomeId, setSelectedIncomeId] = useState(null);
+
+  //delete
+  const deleteIncomeMutation = useMutation({
+    mutationFn: deleteIncome,
+    onSuccess: () => {
+      snackbar.showSuccess("Income has been successfully deleted");
+      queryClient.invalidateQueries({
+        queryKey: ["incomes"],
+      });
+      setOpenDeleteModal();
+    },
+    onError: (error) => {
+      snackbar.showError(error.response.data.message);
+    },
+  });
+
+  const handleDeleteIncome = (_id) => {
+    deleteIncomeMutation.mutate({ token, _id });
+  };
 
   //add
   const [openIncomeDialog, setOpenIncomeDialog] = useState(false);
@@ -106,20 +140,21 @@ export default function Income() {
           }}
         >
           <TextField
+            color="warning"
             sx={{ backgroundColor: "#FEE12B", borderRadius: "4px" }}
-            value={""}
             placeholder="Search by name..."
             InputProps={{
               startAdornment: (
                 <InputAdornment position="start">
-                  <ManageSearchIcon sx={{ color: "white" }} />
+                  <ManageSearchIcon />
                 </InputAdornment>
               ),
             }}
           />
           <Select
+            color="warning"
             sx={{ backgroundColor: "#FEE12B", borderRadius: "4px" }}
-            value={category._id}
+            value={category}
             onChange={(e) => {
               setCategory(e.target.value);
             }}
@@ -186,7 +221,15 @@ export default function Income() {
                       </TableCell>
                       <TableCell align="right" sx={{ color: "white" }}>
                         <Button sx={{ color: "#FEE12B" }}>Edit</Button>
-                        <Button sx={{ color: "#FEE12B" }}>Delete</Button>
+                        <Button
+                          sx={{ color: "#FEE12B" }}
+                          onClick={() => {
+                            setSelectedIncomeId(income._id);
+                            setOpenDeleteModal(true);
+                          }}
+                        >
+                          Delete
+                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -215,6 +258,30 @@ export default function Income() {
           Add Income
         </Button>
       </Box>
+
+      <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
+        <DialogTitle>Are you sure you want to delete this Income ?</DialogTitle>
+        <DialogContent>
+          <Typography>This action is not reversible.</Typography>
+        </DialogContent>
+        <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => setOpenDeleteModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => handleDeleteIncome(selectedIncomeId)}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
+
       <BottomNav />
     </>
   );

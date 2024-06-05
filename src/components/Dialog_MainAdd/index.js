@@ -151,7 +151,7 @@ export default function DialogMainAdd({
     } else if (category === "Category") {
       snackbar.showWarning("Please choose a Category.");
     } else if (amount <= 0) {
-      snackbar.showWarning("Amount cannot be zero");
+      snackbar.showWarning("Amount cannot be less than zero");
     } else {
       addMainExpensesMutation.mutate({
         name,

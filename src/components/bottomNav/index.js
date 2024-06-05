@@ -5,17 +5,27 @@ import BottomNavigation from "@mui/material/BottomNavigation";
 import BottomNavigationAction from "@mui/material/BottomNavigationAction";
 import { Link } from "react-router-dom";
 import DataSaverOffIcon from "@mui/icons-material/DataSaverOff";
-import AddCircleIcon from "@mui/icons-material/AddCircle";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
-import { useNavigate, useLocation } from "react-router-dom";
-import HomeIcon from "@mui/icons-material/Home";
+import { useNavigate } from "react-router-dom";
 import CategoryIcon from "@mui/icons-material/Category";
-import ReceiptIcon from "@mui/icons-material/Receipt";
 import MoneyIcon from "@mui/icons-material/Money";
 import PaidIcon from "@mui/icons-material/Paid";
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+} from "@mui/material";
+import { useState } from "react";
 
 export default function BottomNav() {
-  const location = useLocation();
+  const [cookies] = useCookies(["currentUser"]);
+  const { currentUser = {} } = cookies;
+  const { role, token } = currentUser;
+
+  const [openChartsModal, setOpenChartsModal] = useState(false);
+
   const navigate = useNavigate();
 
   return (
@@ -33,22 +43,52 @@ export default function BottomNav() {
           backgroundColor: "#333333",
         }}
       >
+        {/* // dialog  */}
         <BottomNavigationAction
           disableTouchRipple
           disableRipple
-          component={Link}
-          to="/"
+          onClick={() => {
+            setOpenChartsModal(true);
+          }}
           label="Charts"
           icon={<DataSaverOffIcon />}
           sx={{
             color: "white",
           }}
         />
+        <Dialog
+          open={openChartsModal}
+          onClose={() => setOpenChartsModal(false)}
+        >
+          <DialogTitle>In order to access Charts, PAY FIRST LA BRO</DialogTitle>
+          <DialogContent>Do you still want to proceed ?</DialogContent>
+          <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={() => setOpenChartsModal()}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="warning"
+              onClick={() => {
+                navigate("/");
+                setOpenChartsModal();
+              }}
+            >
+              Yes
+            </Button>
+          </DialogActions>
+        </Dialog>
+        {/* // dialog  */}
         <BottomNavigationAction
           disableTouchRipple
           disableRipple
-          component={Link}
-          to="/"
+          onClick={() => {
+            navigate("/");
+          }}
           label="Expenses"
           icon={<MoneyIcon />}
           sx={{

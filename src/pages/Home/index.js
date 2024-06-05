@@ -5,6 +5,10 @@ import {
   Box,
   Button,
   Container,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
   Divider,
   InputAdornment,
   MenuItem,
@@ -30,11 +34,16 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import TopNav from "../../components/topNav";
 import BottomNav from "../../components/bottomNav";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
-import { getExpenses } from "../../utils/api_expense";
+import { deleteExpense, getExpenses } from "../../utils/api_expense";
 import DialogMainAdd from "../../components/Dialog_MainAdd";
 import { getCategories } from "../../utils/api_categories";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Home() {
+  const queryClient = useQueryClient();
+  const snackbar = useCustomSnackbar();
+
+  // add dialog
   const [openMainDialog, setOpenMainDialog] = useState(false);
   const handleOpenMainDialog = () => setOpenMainDialog(true);
   const handleCloseMainDialog = () => setOpenMainDialog(false);
@@ -54,6 +63,29 @@ export default function Home() {
     queryKey: ["categories"],
     queryFn: () => getCategories(),
   });
+
+  //to open delete dialog
+  const [openDeleteModal, setOpenDeleteModal] = useState(false);
+  // use state here cuz when user press in i put in the argument as expense_id if not is null
+  const [selectedExpenseId, setSelectedExpenseId] = useState(null);
+
+  const deleteExpensesMutation = useMutation({
+    mutationFn: deleteExpense,
+    onSuccess: () => {
+      snackbar.showSuccess("Expenses has been successfully deleted");
+      queryClient.invalidateQueries({
+        queryKey: ["expenses"],
+      });
+      setOpenDeleteModal();
+    },
+    onError: (error) => {
+      snackbar.showError(error.response.data.message);
+    },
+  });
+
+  const handleDeleteExpenses = (_id) => {
+    deleteExpensesMutation.mutate({ token, _id });
+  };
 
   const getIconComponent = (iconName) => {
     switch (iconName) {
@@ -122,19 +154,20 @@ export default function Home() {
             }}
           >
             <TextField
+              color="warning"
               sx={{ backgroundColor: "#FEE12B", borderRadius: "4px" }}
-              focused
               placeholder="Search by name"
               InputProps={{
                 startAdornment: (
                   <InputAdornment position="start">
-                    <ManageSearchIcon sx={{ color: "white" }} />
+                    <ManageSearchIcon />
                   </InputAdornment>
                 ),
               }}
             />
             <Select
-              value={category._id}
+              color="warning"
+              value={category}
               sx={{ backgroundColor: "#FEE12B", borderRadius: "4px" }}
               onChange={(e) => {
                 setCategory(e.target.value);
@@ -213,7 +246,15 @@ export default function Home() {
                             </TableCell>
                             <TableCell align="right" sx={{ color: "white" }}>
                               <Button sx={{ color: "#FEE12B" }}>Edit</Button>
-                              <Button sx={{ color: "#FEE12B" }}>Delete</Button>
+                              <Button
+                                sx={{ color: "#FEE12B" }}
+                                onClick={() => {
+                                  setSelectedExpenseId(expense._id);
+                                  setOpenDeleteModal(true);
+                                }}
+                              >
+                                Delete
+                              </Button>
                             </TableCell>
                           </TableRow>
                         ))}
@@ -244,6 +285,30 @@ export default function Home() {
           Add Expenses
         </Button>
       </Box>
+      <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
+        <DialogTitle>
+          Are you sure you want to delete this expenses ?
+        </DialogTitle>
+        <DialogContent>
+          <Typography>This action is not reversible.</Typography>
+        </DialogContent>
+        <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => setOpenDeleteModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="error"
+            onClick={() => handleDeleteExpenses(selectedExpenseId)}
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
       <BottomNav />
     </>
   );

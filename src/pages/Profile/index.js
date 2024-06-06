@@ -129,46 +129,49 @@ export default function Profile() {
                 width: "auto",
               }}
             >
-              <Button
-                sx={{
-                  color: "black",
-                  padding: "10px",
-                  border: "2px solid",
-                  borderRadius: "10px",
-                  minWidth: "70%",
-                  height: "auto",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  flexDirection: "column",
-                  backgroundColor: "#333333",
-                }}
-                onClick={() => {
-                  navigate("/userM");
-                }}
-              >
-                <Grid
-                  container
-                  spacing={2}
-                  justifyContent="center"
-                  alignItems="center"
+              {currentUser.role === "admin" ? (
+                <Button
+                  sx={{
+                    color: "black",
+                    padding: "10px",
+                    border: "2px solid",
+                    borderRadius: "10px",
+                    minWidth: "70%",
+                    height: "auto",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    flexDirection: "column",
+                    backgroundColor: "#333333",
+                  }}
+                  onClick={() => {
+                    navigate("/userM");
+                  }}
                 >
-                  <Grid item xs={1} container justifyContent="center">
-                    <AccessibleIcon sx={{ color: "#FEE12B" }} />
+                  <Grid
+                    container
+                    spacing={2}
+                    justifyContent="center"
+                    alignItems="center"
+                  >
+                    <Grid item xs={1} container justifyContent="center">
+                      <AccessibleIcon sx={{ color: "#FEE12B" }} />
+                    </Grid>
+                    <Grid item xs={10} container alignItems="center">
+                      <Typography
+                        sx={{
+                          color: "white",
+                          fontWeight: 700,
+                          fontSize: "15px",
+                        }}
+                      >
+                        User Management
+                      </Typography>
+                    </Grid>
                   </Grid>
-                  <Grid item xs={10} container alignItems="center">
-                    <Typography
-                      sx={{
-                        color: "white",
-                        fontWeight: 700,
-                        fontSize: "15px",
-                      }}
-                    >
-                      User Management
-                    </Typography>
-                  </Grid>
-                </Grid>
-              </Button>
+                </Button>
+              ) : null}
+
               <DialogLogout
                 openLogoutDialog={openLogoutDialog}
                 handleCloseLogoutDialog={handleCloseLogoutDialog}

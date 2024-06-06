@@ -30,3 +30,26 @@ export const addUser = async (data) => {
   );
   return response.data;
 };
+
+export const updateUser = async (data) => {
+  const response = await axios.put(
+    `${url}/users/${data.id}`,
+    JSON.stringify(data),
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + data.token,
+      },
+    }
+  );
+  return response.data;
+};
+
+export const deleteUser = async (data) => {
+  const response = await axios.delete(`${url}/users/${data._id}`, {
+    headers: {
+      Authorization: "Bearer " + data.token,
+    },
+  });
+  return response.data;
+};

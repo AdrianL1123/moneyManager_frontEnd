@@ -25,16 +25,7 @@ export default function DialogLogout({
 
   return (
     <Container>
-      <Dialog
-        open={openLogoutDialog}
-        onClose={handleCloseLogoutDialog}
-        PaperProps={{
-          sx: {
-            backgroundColor: "#232323",
-            color: "white",
-          },
-        }}
-      >
+      <Dialog open={openLogoutDialog} onClose={handleCloseLogoutDialog}>
         <DialogTitle variant="h6" align="center">
           Are you sure you want to Log out?
         </DialogTitle>

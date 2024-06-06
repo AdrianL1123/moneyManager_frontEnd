@@ -53,6 +53,7 @@ export default function Home() {
   const handleCloseMainDialog = () => setOpenMainDialog(false);
 
   const [category, setCategory] = useState("Category");
+  const [amount, setAmount] = useState("Normal");
 
   const [cookies] = useCookies(["currentUser"]);
   const { currentUser = {} } = cookies;
@@ -206,18 +207,6 @@ export default function Home() {
               gap: 2,
             }}
           >
-            <TextField
-              color="warning"
-              sx={{ backgroundColor: "#FEE12B", borderRadius: "4px" }}
-              placeholder="Search by name"
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <ManageSearchIcon />
-                  </InputAdornment>
-                ),
-              }}
-            />
             <Select
               color="warning"
               value={category}
@@ -232,6 +221,18 @@ export default function Home() {
                   {c.name}
                 </MenuItem>
               ))}
+            </Select>
+            <Select
+              color="warning"
+              value={amount}
+              sx={{ backgroundColor: "#FEE12B", borderRadius: "4px" }}
+              onChange={(e) => {
+                setAmount(e.target.value);
+              }}
+            >
+              <MenuItem value="Normal">Normal Amount</MenuItem>
+              <MenuItem value="Ascending">Ascending Amount</MenuItem>
+              <MenuItem value="Descending">Descending Amount</MenuItem>
             </Select>
           </Box>
           <Divider

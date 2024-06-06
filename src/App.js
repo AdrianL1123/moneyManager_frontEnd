@@ -10,10 +10,14 @@ import SignUp from "./pages/SignUp";
 import Categories from "./pages/Categories";
 import Profile from "./pages/Profile";
 import CategoryIncome from "./pages/CategoriesIncome";
-import { SnackbarProvider } from "material-ui-snackbar-provider"; // Ensure this package is installed and imported correctly
+import { SnackbarProvider } from "material-ui-snackbar-provider";
 import CustomSnackbar from "./components/CustomSnackbar";
 import Income from "./pages/Income";
 import IncomeEdit from "./pages/IncomeEdit";
+import UserManagement from "./pages/UserManagement";
+import Subscription from "./pages/Subscription";
+// import Checkout from "./pages/Checkout";
+import PaymentVerify from "./pages/PaymentVerify";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +39,9 @@ export default function App() {
               <Route path="/signup" element={<SignUp />} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/categoriesIncome" element={<CategoryIncome />} />
+              <Route path="/userM" element={<UserManagement />} />
+              <Route path="/subscription" element={<Subscription />} />
+              <Route path="/verify-payment" element={<PaymentVerify />} />
             </Routes>
           </BrowserRouter>
         </SnackbarProvider>

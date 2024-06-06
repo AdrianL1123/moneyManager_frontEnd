@@ -7,6 +7,7 @@ import { Link } from "react-router-dom";
 import DataSaverOffIcon from "@mui/icons-material/DataSaverOff";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useNavigate } from "react-router-dom";
+import useCustomSnackbar from "../../components/useCustomSnackbar";
 import CategoryIcon from "@mui/icons-material/Category";
 import MoneyIcon from "@mui/icons-material/Money";
 import PaidIcon from "@mui/icons-material/Paid";
@@ -18,11 +19,44 @@ import {
   DialogTitle,
 } from "@mui/material";
 import { useState } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import {
+  addNewSubscription,
+  getSubscriptions,
+} from "../../utils/api_subscription";
 
 export default function BottomNav() {
+  const snackbar = useCustomSnackbar();
+
   const [cookies] = useCookies(["currentUser"]);
   const { currentUser = {} } = cookies;
   const { role, token } = currentUser;
+
+  const { data: subscriptions = [] } = useQuery({
+    queryKey: ["subscription", token],
+    queryFn: () => getSubscriptions(token),
+  });
+
+  //payment
+  const addNewSubscriptionMutation = useMutation({
+    mutationFn: addNewSubscription,
+    onSuccess: (responseData) => {
+      const billplz_url = responseData.data.billplz_url;
+      window.location.href = billplz_url;
+    },
+    onError: (error) => {
+      snackbar.showError(error.response.data.message);
+    },
+  });
+
+  const handleCheckout = () => {
+    addNewSubscriptionMutation.mutate({
+      user_id: subscriptions.user_id,
+      totalPrice: 5,
+      token,
+    });
+  };
+  //payment
 
   const [openChartsModal, setOpenChartsModal] = useState(false);
 
@@ -38,15 +72,12 @@ export default function BottomNav() {
       }}
     >
       <BottomNavigation
-        showLabels
         sx={{
           backgroundColor: "#333333",
         }}
+        showLabels
       >
-        {/* // dialog  */}
         <BottomNavigationAction
-          disableTouchRipple
-          disableRipple
           onClick={() => {
             setOpenChartsModal(true);
           }}
@@ -61,31 +92,25 @@ export default function BottomNav() {
           onClose={() => setOpenChartsModal(false)}
         >
           <DialogTitle>In order to access Charts, PAY FIRST LA BRO</DialogTitle>
-          <DialogContent>Do you still want to proceed ?</DialogContent>
+          <DialogContent>Do you still want to proceed?</DialogContent>
           <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
             <Button
               variant="contained"
               color="warning"
-              onClick={() => setOpenChartsModal()}
+              onClick={() => setOpenChartsModal(false)}
             >
               Cancel
             </Button>
             <Button
               variant="contained"
               color="warning"
-              onClick={() => {
-                navigate("/");
-                setOpenChartsModal();
-              }}
+              onClick={handleCheckout}
             >
-              Yes
+              Yes, Pay now
             </Button>
           </DialogActions>
         </Dialog>
-        {/* // dialog  */}
         <BottomNavigationAction
-          disableTouchRipple
-          disableRipple
           onClick={() => {
             navigate("/");
           }}
@@ -96,8 +121,6 @@ export default function BottomNav() {
           }}
         />
         <BottomNavigationAction
-          disableTouchRipple
-          disableRipple
           label="Me"
           icon={<AccountCircleIcon />}
           sx={{
@@ -108,8 +131,6 @@ export default function BottomNav() {
           }}
         />
         <BottomNavigationAction
-          disableTouchRipple
-          disableRipple
           component={Link}
           to="/income"
           label="Income"
@@ -118,41 +139,38 @@ export default function BottomNav() {
             color: "white",
           }}
         />
-
-        {/* <BottomNavigationAction
-          disableTouchRipple
-          disableRipple
-          label="Transactions"
-          icon={<ReceiptIcon />}
-          sx={{
-            color: "white",
-          }}
-          onClick={() => {
-            navigate("/");
-          }}
-        /> */}
+        {currentUser.role === "admin" && [
+          <BottomNavigationAction
+            key="categories-expenses"
+            label="Categories For Expenses"
+            icon={<CategoryIcon />}
+            sx={{
+              color: "white",
+            }}
+            onClick={() => {
+              navigate("/categories");
+            }}
+          />,
+          <BottomNavigationAction
+            key="categories-income"
+            label="Categories For Income"
+            icon={<CategoryIcon />}
+            sx={{
+              color: "white",
+            }}
+            onClick={() => {
+              navigate("/categoriesIncome");
+            }}
+          />,
+        ]}
         <BottomNavigationAction
-          disableTouchRipple
-          disableRipple
-          label="Categories For Expenses"
-          icon={<CategoryIcon />}
+          label="Subscriptions"
+          icon={<PaidIcon />}
           sx={{
             color: "white",
           }}
           onClick={() => {
-            navigate("/categories");
-          }}
-        />
-        <BottomNavigationAction
-          disableTouchRipple
-          disableRipple
-          label="Categories For Income"
-          icon={<CategoryIcon />}
-          sx={{
-            color: "white",
-          }}
-          onClick={() => {
-            navigate("/categoriesIncome");
+            navigate("/subscription");
           }}
         />
       </BottomNavigation>

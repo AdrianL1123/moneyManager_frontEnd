@@ -34,7 +34,11 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import TopNav from "../../components/topNav";
 import BottomNav from "../../components/bottomNav";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
-import { deleteExpense, getExpenses } from "../../utils/api_expense";
+import {
+  deleteExpense,
+  getExpenses,
+  updateExpense,
+} from "../../utils/api_expense";
 import DialogMainAdd from "../../components/Dialog_MainAdd";
 import { getCategories } from "../../utils/api_categories";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -69,6 +73,22 @@ export default function Home() {
   // use state here cuz when user press in i put in the argument as expense_id if not is null
   const [selectedExpenseId, setSelectedExpenseId] = useState(null);
 
+  //to open edit dialog
+  const [openEditModal, setOpenEditModal] = useState(false);
+  //states for edit
+  const [editName, setEditName] = useState("");
+  const [editNameID, setEditNameID] = useState("");
+
+  const [editAmount, setEditAmount] = useState(0);
+  const [editAmountID, setEditAmountID] = useState(0);
+
+  const [editDescription, setEditDescription] = useState("");
+  const [editDescriptionID, setEditDescriptionID] = useState("");
+
+  const [editCategory, setEditCategory] = useState("");
+  const [editCategoryID, setEditCategoryID] = useState("");
+
+  //delete
   const deleteExpensesMutation = useMutation({
     mutationFn: deleteExpense,
     onSuccess: () => {
@@ -85,6 +105,39 @@ export default function Home() {
 
   const handleDeleteExpenses = (_id) => {
     deleteExpensesMutation.mutate({ token, _id });
+  };
+
+  //edit
+  const updateCategoryMutation = useMutation({
+    mutationFn: updateExpense,
+    onSuccess: () => {
+      snackbar.showSuccess("Expense has been updated successfully.");
+      queryClient.invalidateQueries(["expenses"]);
+      setOpenEditModal(false);
+    },
+    onError: (error) => {
+      snackbar.showError(error.response.data.message);
+    },
+  });
+
+  const handleEdit = () => {
+    if (
+      editName === "" ||
+      editAmount <= 0 ||
+      editDescription === "" ||
+      editCategory === "All Types"
+    ) {
+      snackbar.showWarning("Please fill in the details.");
+    } else {
+      updateCategoryMutation.mutate({
+        id: editNameID,
+        name: editName,
+        amount: editAmount,
+        category: editCategory,
+        description: editDescription,
+        token: token,
+      });
+    }
   };
 
   const getIconComponent = (iconName) => {
@@ -245,7 +298,26 @@ export default function Home() {
                               {`$${expense.amount}`}
                             </TableCell>
                             <TableCell align="right" sx={{ color: "white" }}>
-                              <Button sx={{ color: "#FEE12B" }}>Edit</Button>
+                              <Button
+                                sx={{ color: "#FEE12B" }}
+                                onClick={() => {
+                                  setOpenEditModal(true);
+
+                                  setEditName(expense.name);
+                                  setEditNameID(expense._id);
+
+                                  setEditAmount(expense.amount);
+                                  setEditAmountID(expense._id);
+
+                                  setEditDescription(expense.description);
+                                  setEditDescriptionID(expense._id);
+
+                                  setEditCategory(expense.category._id);
+                                  setEditCategoryID(expense._id);
+                                }}
+                              >
+                                Edit
+                              </Button>
                               <Button
                                 sx={{ color: "#FEE12B" }}
                                 onClick={() => {
@@ -285,6 +357,8 @@ export default function Home() {
           Add Expenses
         </Button>
       </Box>
+
+      {/* delete */}
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>
           Are you sure you want to delete this expenses ?
@@ -309,6 +383,69 @@ export default function Home() {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* delete */}
+
+      {/* //edit dialog */}
+      <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
+        <DialogTitle>Edit For Expenses</DialogTitle>
+        <DialogContent>
+          <TextField
+            placeholder="Category"
+            variant="outlined"
+            fullWidth
+            sx={{ marginBottom: "10px" }}
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+          />
+          <TextField
+            type="number"
+            variant="outlined"
+            fullWidth
+            sx={{ marginBottom: "10px" }}
+            value={editAmount}
+            onChange={(e) => setEditAmount(e.target.value)}
+          />
+          <TextField
+            variant="outlined"
+            fullWidth
+            sx={{ marginBottom: "10px" }}
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+          />
+          <Select
+            fullWidth
+            value={editCategory}
+            onChange={(e) => {
+              setEditCategory(e.target.value);
+            }}
+          >
+            {categories.map((c) => (
+              <MenuItem key={c._id} value={c._id}>
+                {getIconComponent(c.icon)}
+                {c.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </DialogContent>
+        <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => setOpenEditModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => handleEdit()}
+          >
+            Edit
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* //edit dialog */}
+
       <BottomNav />
     </>
   );

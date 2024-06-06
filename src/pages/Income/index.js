@@ -25,7 +25,7 @@ import {
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import TopNav from "../../components/topNav";
 import DialogIncomeAdd from "../../components/Dialog_Add_Income";
-import { deleteIncome, getIncomes } from "../../utils/api_income";
+import { deleteIncome, getIncomes, updateIncome } from "../../utils/api_income";
 import PriceCheckIcon from "@mui/icons-material/PriceCheck";
 import NewReleasesIcon from "@mui/icons-material/NewReleases";
 import TimelapseIcon from "@mui/icons-material/Timelapse";
@@ -38,10 +38,15 @@ import useCustomSnackbar from "../../components/useCustomSnackbar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export default function Income() {
+  const navigate = useNavigate();
+
   const queryClient = useQueryClient();
   const snackbar = useCustomSnackbar();
 
-  const navigate = useNavigate();
+  //add
+  const [openIncomeDialog, setOpenIncomeDialog] = useState(false);
+  const handleOpenIncomeDialog = () => setOpenIncomeDialog(true);
+  const handleCloseIncomeDialog = () => setOpenIncomeDialog(false);
 
   const [cookies] = useCookies(["currentUser"]);
   const { currentUser = {} } = cookies;
@@ -63,6 +68,21 @@ export default function Income() {
   // use state here cuz when user press in i put in the argument as income_id if not is null
   const [selectedIncomeId, setSelectedIncomeId] = useState(null);
 
+  //to open edit dialog
+  const [openEditModal, setOpenEditModal] = useState(false);
+  //states for edit
+  const [editName, setEditName] = useState("");
+  const [editNameID, setEditNameID] = useState("");
+
+  const [editAmount, setEditAmount] = useState(0);
+  const [editAmountID, setEditAmountID] = useState(0);
+
+  const [editDescription, setEditDescription] = useState("");
+  const [editDescriptionID, setEditDescriptionID] = useState("");
+
+  const [editCategory, setEditCategory] = useState("");
+  const [editCategoryID, setEditCategoryID] = useState("");
+
   //delete
   const deleteIncomeMutation = useMutation({
     mutationFn: deleteIncome,
@@ -82,10 +102,38 @@ export default function Income() {
     deleteIncomeMutation.mutate({ token, _id });
   };
 
-  //add
-  const [openIncomeDialog, setOpenIncomeDialog] = useState(false);
-  const handleOpenIncomeDialog = () => setOpenIncomeDialog(true);
-  const handleCloseIncomeDialog = () => setOpenIncomeDialog(false);
+  //edit
+  const updateCategoryMutation = useMutation({
+    mutationFn: updateIncome,
+    onSuccess: () => {
+      snackbar.showSuccess("Expense has been updated successfully.");
+      queryClient.invalidateQueries(["incomes"]);
+      setOpenEditModal(false);
+    },
+    onError: (error) => {
+      snackbar.showError(error.response.data.message);
+    },
+  });
+
+  const handleEdit = () => {
+    if (
+      editName === "" ||
+      editAmount <= 0 ||
+      editDescription === "" ||
+      editCategory === "All Types"
+    ) {
+      snackbar.showWarning("Please fill in the details.");
+    } else {
+      updateCategoryMutation.mutate({
+        id: editNameID,
+        name: editName,
+        amount: editAmount,
+        category: editCategory,
+        description: editDescription,
+        token: token,
+      });
+    }
+  };
 
   const getIconIncomeComponent = (iconNameIncome) => {
     switch (iconNameIncome) {
@@ -220,7 +268,26 @@ export default function Income() {
                         {`$${income.amount}`}
                       </TableCell>
                       <TableCell align="right" sx={{ color: "white" }}>
-                        <Button sx={{ color: "#FEE12B" }}>Edit</Button>
+                        <Button
+                          sx={{ color: "#FEE12B" }}
+                          onClick={() => {
+                            setOpenEditModal(true);
+
+                            setEditName(income.name);
+                            setEditNameID(income._id);
+
+                            setEditAmount(income.amount);
+                            setEditAmountID(income._id);
+
+                            setEditDescription(income.description);
+                            setEditDescriptionID(income._id);
+
+                            setEditCategory(income.category._id);
+                            setEditCategoryID(income._id);
+                          }}
+                        >
+                          Edit
+                        </Button>
                         <Button
                           sx={{ color: "#FEE12B" }}
                           onClick={() => {
@@ -259,6 +326,7 @@ export default function Income() {
         </Button>
       </Box>
 
+      {/* delete */}
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>
         <DialogTitle>Are you sure you want to delete this Income ?</DialogTitle>
         <DialogContent>
@@ -281,6 +349,68 @@ export default function Income() {
           </Button>
         </DialogActions>
       </Dialog>
+      {/* delete */}
+
+      {/* //edit dialog */}
+      <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
+        <DialogTitle>Edit For Income</DialogTitle>
+        <DialogContent>
+          <TextField
+            placeholder="Category"
+            variant="outlined"
+            fullWidth
+            sx={{ marginBottom: "10px" }}
+            value={editName}
+            onChange={(e) => setEditName(e.target.value)}
+          />
+          <TextField
+            type="number"
+            variant="outlined"
+            fullWidth
+            sx={{ marginBottom: "10px" }}
+            value={editAmount}
+            onChange={(e) => setEditAmount(e.target.value)}
+          />
+          <TextField
+            variant="outlined"
+            fullWidth
+            sx={{ marginBottom: "10px" }}
+            value={editDescription}
+            onChange={(e) => setEditDescription(e.target.value)}
+          />
+          <Select
+            fullWidth
+            value={editCategory}
+            onChange={(e) => {
+              setEditCategory(e.target.value);
+            }}
+          >
+            {categoriesIncome.map((ci) => (
+              <MenuItem key={ci._id} value={ci._id}>
+                {getIconIncomeComponent(ci.icon)}
+                {ci.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </DialogContent>
+        <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => setOpenEditModal(false)}
+          >
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="warning"
+            onClick={() => handleEdit()}
+          >
+            Edit
+          </Button>
+        </DialogActions>
+      </Dialog>
+      {/* //edit dialog */}
 
       <BottomNav />
     </>

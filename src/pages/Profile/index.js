@@ -13,6 +13,7 @@ import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
 // import ButtonInfo from "../../components/buttonInfo";
+import AccessibleIcon from "@mui/icons-material/Accessible";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import { useCookies } from "react-cookie";
 import { useState } from "react";
@@ -64,59 +65,116 @@ export default function Profile() {
           <Divider sx={{ borderColor: "white" }} />
         </Container>
         {currentUser ? (
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              justifyContent: "center",
-              paddingTop: "20px",
-              width: "auto",
-            }}
-          >
-            <Button
+          <>
+            <Box
               sx={{
-                color: "black",
-                padding: "10px",
-                border: "2px solid",
-                borderRadius: "10px",
-                minWidth: "70%",
-                height: "auto",
                 display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
                 flexDirection: "column",
-                backgroundColor: "#333333",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingTop: "20px",
+                width: "auto",
               }}
-              onClick={handleOpenLogoutDialog}
             >
-              <Grid
-                container
-                spacing={2}
-                justifyContent="center"
-                alignItems="center"
+              <Button
+                sx={{
+                  color: "black",
+                  padding: "10px",
+                  border: "2px solid",
+                  borderRadius: "10px",
+                  minWidth: "70%",
+                  height: "auto",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  backgroundColor: "#333333",
+                }}
+                onClick={handleOpenLogoutDialog}
               >
-                <Grid item xs={1} container justifyContent="center">
-                  <LogoutIcon sx={{ color: "#FEE12B" }} />
+                <Grid
+                  container
+                  spacing={2}
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Grid item xs={1} container justifyContent="center">
+                    <LogoutIcon sx={{ color: "#FEE12B" }} />
+                  </Grid>
+                  <Grid item xs={10} container alignItems="center">
+                    <Typography
+                      sx={{
+                        color: "white",
+                        fontWeight: 700,
+                        fontSize: "15px",
+                      }}
+                    >
+                      Log out
+                    </Typography>
+                  </Grid>
                 </Grid>
-                <Grid item xs={10} container alignItems="center">
-                  <Typography
-                    sx={{
-                      color: "white",
-                      fontWeight: 700,
-                      fontSize: "15px",
-                    }}
-                  >
-                    Log out
-                  </Typography>
+              </Button>
+              <DialogLogout
+                openLogoutDialog={openLogoutDialog}
+                handleCloseLogoutDialog={handleCloseLogoutDialog}
+              />
+            </Box>
+            <Box
+              sx={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingTop: "20px",
+                width: "auto",
+              }}
+            >
+              <Button
+                sx={{
+                  color: "black",
+                  padding: "10px",
+                  border: "2px solid",
+                  borderRadius: "10px",
+                  minWidth: "70%",
+                  height: "auto",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  flexDirection: "column",
+                  backgroundColor: "#333333",
+                }}
+                onClick={() => {
+                  navigate("/userM");
+                }}
+              >
+                <Grid
+                  container
+                  spacing={2}
+                  justifyContent="center"
+                  alignItems="center"
+                >
+                  <Grid item xs={1} container justifyContent="center">
+                    <AccessibleIcon sx={{ color: "#FEE12B" }} />
+                  </Grid>
+                  <Grid item xs={10} container alignItems="center">
+                    <Typography
+                      sx={{
+                        color: "white",
+                        fontWeight: 700,
+                        fontSize: "15px",
+                      }}
+                    >
+                      User Management
+                    </Typography>
+                  </Grid>
                 </Grid>
-              </Grid>
-            </Button>
-            <DialogLogout
-              openLogoutDialog={openLogoutDialog}
-              handleCloseLogoutDialog={handleCloseLogoutDialog}
-            />
-          </Box>
+              </Button>
+              <DialogLogout
+                openLogoutDialog={openLogoutDialog}
+                handleCloseLogoutDialog={handleCloseLogoutDialog}
+              />
+            </Box>
+          </>
         ) : (
           <>
             <Box

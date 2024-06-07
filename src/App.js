@@ -18,6 +18,7 @@ import UserManagement from "./pages/UserManagement";
 import Subscription from "./pages/Subscription";
 // import Checkout from "./pages/Checkout";
 import PaymentVerify from "./pages/PaymentVerify";
+import Charts from "./pages/Charts";
 
 const queryClient = new QueryClient();
 
@@ -42,6 +43,7 @@ export default function App() {
               <Route path="/userM" element={<UserManagement />} />
               <Route path="/subscription" element={<Subscription />} />
               <Route path="/verify-payment" element={<PaymentVerify />} />
+              <Route path="/charts" element={<Charts />} />
             </Routes>
           </BrowserRouter>
         </SnackbarProvider>

@@ -34,6 +34,7 @@ import DialogCategoryAdd from "../../components/Dialog_Category_Add";
 import useCustomSnackbar from "../../components/useCustomSnackbar";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteCategory } from "../../utils/api_categories";
+import { useNavigate } from "react-router-dom";
 
 export default function Categories() {
   const queryClient = useQueryClient();
@@ -49,6 +50,7 @@ export default function Categories() {
   };
 
   const [cookies] = useCookies(["currentUser"]);
+  const navigate = useNavigate();
   const { currentUser = {} } = cookies;
   const { role, token } = currentUser;
 
@@ -136,168 +138,196 @@ export default function Categories() {
 
   return (
     <>
-      <Container style={{ paddingTop: "20px", width: "100%" }}>
-        <Typography
-          variant="h4"
-          color={"white"}
-          align="center"
-          paddingBottom={"20px"}
-        >
-          Categories For Expenses
-        </Typography>
-        <Divider sx={{ borderColor: "white" }} />
+      {currentUser.role !== "admin" ? (
         <Container
           sx={{
-            display: "flex",
+            height: "100vh",
+            width: "100%",
+            display: " flex",
             justifyContent: "center",
-            alignItems: "center",
-            paddingTop: "20px",
+            color: "white",
             flexDirection: "column",
           }}
         >
+          <Typography variant="h2" align="center" color={"error"}>
+            Page not found
+          </Typography>
           <Button
-            endIcon={<PlaylistAddIcon />}
-            sx={{ fontSize: "12px", color: "#FEE12B" }}
-            onClick={handleOpenDialog}
+            color="warning"
+            onClick={() => {
+              navigate("/profile");
+            }}
           >
-            Add A Category
+            Return back to profile
           </Button>
+        </Container>
+      ) : (
+        <>
+          {" "}
+          <Container style={{ paddingTop: "20px", width: "100%" }}>
+            <Typography
+              variant="h4"
+              color={"white"}
+              align="center"
+              paddingBottom={"20px"}
+            >
+              Categories For Expenses
+            </Typography>
+            <Divider sx={{ borderColor: "white" }} />
+            <Container
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                paddingTop: "20px",
+                flexDirection: "column",
+              }}
+            >
+              <Button
+                endIcon={<PlaylistAddIcon />}
+                sx={{ fontSize: "12px", color: "#FEE12B" }}
+                onClick={handleOpenDialog}
+              >
+                Add A Category
+              </Button>
 
-          <DialogCategoryAdd
-            openDialog={openDialog}
-            handleCloseDialog={handleCloseDialog}
-          />
+              <DialogCategoryAdd
+                openDialog={openDialog}
+                handleCloseDialog={handleCloseDialog}
+              />
 
-          <TableContainer sx={{ maxWidth: "600px", width: "100%" }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell width={"20%"} sx={{ color: "white" }}>
-                    Icon
-                  </TableCell>
-                  <TableCell align="left" sx={{ color: "white" }}>
-                    Name
-                  </TableCell>
-                  <TableCell align="right" sx={{ color: "white" }}>
-                    Actions
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {categories.length > 0 ? (
-                  categories.map((c) => (
-                    <TableRow key={c._id}>
+              <TableContainer sx={{ maxWidth: "600px", width: "100%" }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
                       <TableCell width={"20%"} sx={{ color: "white" }}>
-                        {getIconComponent(c.icon)}
+                        Icon
                       </TableCell>
                       <TableCell align="left" sx={{ color: "white" }}>
-                        {c.name}
+                        Name
                       </TableCell>
                       <TableCell align="right" sx={{ color: "white" }}>
-                        <Button
-                          sx={{ color: "#FEE12B" }}
-                          onClick={() => {
-                            setOpenEditModal(true);
-                            setEditName(c.name);
-                            setEditNameID(c._id);
-                            setEditIcon(c.icon);
-                            setEditIconID(c._id);
-                          }}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          sx={{ color: "#FEE12B" }}
-                          onClick={() => handleDeleteCategory(c._id)}
-                        >
-                          Remove
-                        </Button>
+                        Actions
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={3}
-                      align="center"
-                      sx={{ color: "white" }}
-                    >
-                      No categories added yet
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Container>
-      </Container>
-      <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
-        <DialogTitle>Edit Category For Expenses</DialogTitle>
-        <DialogContent>
-          <TextField
-            placeholder="Category"
-            variant="outlined"
-            fullWidth
-            sx={{ marginBottom: "10px" }}
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-          />
-          <Select
-            labelId="icon-select-label"
-            id="icon-select"
-            fullWidth
-            value={editIcon}
-            onChange={(e) => setEditIcon(e.target.value)}
-            sx={{ marginTop: "10px" }}
-          >
-            <MenuItem value="Shopping">
-              <ShoppingBagIcon />
-              <Typography>Shopping</Typography>
-            </MenuItem>
-            <MenuItem value="Food">
-              <RestaurantIcon />
-              <Typography>Food</Typography>
-            </MenuItem>
-            <MenuItem value="Transportation">
-              <EmojiTransportationIcon />
-              <Typography>Transportation</Typography>
-            </MenuItem>
-            <MenuItem value="Entertainment">
-              <SportsEsportsIcon />
-              <Typography>Entertainment</Typography>
-            </MenuItem>
-            <MenuItem value="Pet">
-              <PetsIcon />
-              <Typography>Pet</Typography>
-            </MenuItem>
-            <MenuItem value="Health">
-              <FavoriteIcon />
-              <Typography>Health</Typography>
-            </MenuItem>
-            <MenuItem value="Gift">
-              <CardGiftcardIcon />
-              <Typography>Gift</Typography>
-            </MenuItem>
-          </Select>
-        </DialogContent>
-        <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={() => setOpenEditModal(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={() => handleEdit()}
-          >
-            Edit
-          </Button>
-        </DialogActions>
-      </Dialog>
-      <BottomNav />
+                  </TableHead>
+                  <TableBody>
+                    {categories.length > 0 ? (
+                      categories.map((c) => (
+                        <TableRow key={c._id}>
+                          <TableCell width={"20%"} sx={{ color: "white" }}>
+                            {getIconComponent(c.icon)}
+                          </TableCell>
+                          <TableCell align="left" sx={{ color: "white" }}>
+                            {c.name}
+                          </TableCell>
+                          <TableCell align="right" sx={{ color: "white" }}>
+                            <Button
+                              sx={{ color: "#FEE12B" }}
+                              onClick={() => {
+                                setOpenEditModal(true);
+                                setEditName(c.name);
+                                setEditNameID(c._id);
+                                setEditIcon(c.icon);
+                                setEditIconID(c._id);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              sx={{ color: "#FEE12B" }}
+                              onClick={() => handleDeleteCategory(c._id)}
+                            >
+                              Remove
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={3}
+                          align="center"
+                          sx={{ color: "white" }}
+                        >
+                          No categories added yet
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Container>
+          </Container>
+          <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
+            <DialogTitle>Edit Category For Expenses</DialogTitle>
+            <DialogContent>
+              <TextField
+                placeholder="Category"
+                variant="outlined"
+                fullWidth
+                sx={{ marginBottom: "10px" }}
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
+              />
+              <Select
+                labelId="icon-select-label"
+                id="icon-select"
+                fullWidth
+                value={editIcon}
+                onChange={(e) => setEditIcon(e.target.value)}
+                sx={{ marginTop: "10px" }}
+              >
+                <MenuItem value="Shopping">
+                  <ShoppingBagIcon />
+                  <Typography>Shopping</Typography>
+                </MenuItem>
+                <MenuItem value="Food">
+                  <RestaurantIcon />
+                  <Typography>Food</Typography>
+                </MenuItem>
+                <MenuItem value="Transportation">
+                  <EmojiTransportationIcon />
+                  <Typography>Transportation</Typography>
+                </MenuItem>
+                <MenuItem value="Entertainment">
+                  <SportsEsportsIcon />
+                  <Typography>Entertainment</Typography>
+                </MenuItem>
+                <MenuItem value="Pet">
+                  <PetsIcon />
+                  <Typography>Pet</Typography>
+                </MenuItem>
+                <MenuItem value="Health">
+                  <FavoriteIcon />
+                  <Typography>Health</Typography>
+                </MenuItem>
+                <MenuItem value="Gift">
+                  <CardGiftcardIcon />
+                  <Typography>Gift</Typography>
+                </MenuItem>
+              </Select>
+            </DialogContent>
+            <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={() => setOpenEditModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={() => handleEdit()}
+              >
+                Edit
+              </Button>
+            </DialogActions>
+          </Dialog>
+          <BottomNav />
+        </>
+      )}
     </>
   );
 }

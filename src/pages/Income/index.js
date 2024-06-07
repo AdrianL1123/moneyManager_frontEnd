@@ -187,21 +187,18 @@ export default function Income() {
             gap: 2,
           }}
         >
-          <TextField
+          <Button
+            endIcon={<AddCircleIcon />}
             color="warning"
-            sx={{ backgroundColor: "#FEE12B", borderRadius: "4px" }}
-            placeholder="Search by name..."
-            InputProps={{
-              startAdornment: (
-                <InputAdornment position="start">
-                  <ManageSearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
+            onClick={handleOpenIncomeDialog}
+            sx={{ justifyContent: "center", color: "#FEE12B" }}
+          >
+            Add Income
+          </Button>
           <Select
             color="warning"
-            sx={{ backgroundColor: "#FEE12B", borderRadius: "4px" }}
+            variant="standard"
+            sx={{ color: "#FEE12B", borderRadius: "4px", padding: "15px" }}
             value={category}
             onChange={(e) => {
               setCategory(e.target.value);
@@ -219,90 +216,101 @@ export default function Income() {
           sx={{ borderColor: "white", width: "350px", paddingTop: "10px" }}
         />
         {incomes.length > 0 ? (
-          <TableContainer
-            sx={{ maxWidth: "100%", width: "100%", paddingTop: "10px" }}
+          <div
+            style={{
+              height: "auto",
+              width: "100%",
+              overflow: "auto",
+            }}
           >
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell align="left" sx={{ color: "white", width: "23%" }}>
-                    Date
-                  </TableCell>
-                  <TableCell align="left" sx={{ color: "white" }}>
-                    Type
-                  </TableCell>
-                  <TableCell align="left" sx={{ color: "white" }}>
-                    Name
-                  </TableCell>
-                  <TableCell align="right" sx={{ color: "white" }}>
-                    Amount
-                  </TableCell>
-                  <TableCell align="right" sx={{ color: "white" }}>
-                    Actions
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {incomes
-                  .filter((income) => income.user_id === _id)
-                  .map((income) => (
-                    <TableRow key={income._id}>
-                      <TableCell align="left" sx={{ color: "gray" }}>
-                        {income.created_at.split("T")[0]}
-                      </TableCell>
-                      <TableCell
-                        align="left"
-                        sx={{ color: "white", width: "20%" }}
-                      >
-                        <Box sx={{ display: "flex", alignItems: "center" }}>
-                          {getIconIncomeComponent(income.category.icon)}
-                          <Box sx={{ margin: "5px" }}>
-                            {income.category.name}
+            <TableContainer
+              sx={{ maxWidth: "100%", width: "100%", paddingTop: "10px" }}
+            >
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell
+                      align="left"
+                      sx={{ color: "white", width: "23%" }}
+                    >
+                      Date
+                    </TableCell>
+                    <TableCell align="left" sx={{ color: "white" }}>
+                      Type
+                    </TableCell>
+                    <TableCell align="left" sx={{ color: "white" }}>
+                      Name
+                    </TableCell>
+                    <TableCell align="right" sx={{ color: "white" }}>
+                      Amount
+                    </TableCell>
+                    <TableCell align="right" sx={{ color: "white" }}>
+                      Actions
+                    </TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {incomes
+                    .filter((income) => income.user_id === _id)
+                    .map((income) => (
+                      <TableRow key={income._id}>
+                        <TableCell align="left" sx={{ color: "gray" }}>
+                          {income.created_at.split("T")[0]}
+                        </TableCell>
+                        <TableCell
+                          align="left"
+                          sx={{ color: "white", width: "20%" }}
+                        >
+                          <Box sx={{ display: "flex", alignItems: "center" }}>
+                            {getIconIncomeComponent(income.category.icon)}
+                            <Box sx={{ margin: "5px" }}>
+                              {income.category.name}
+                            </Box>
                           </Box>
-                        </Box>
-                      </TableCell>
-                      <TableCell align="left" sx={{ color: "white" }}>
-                        {income.name}
-                      </TableCell>
-                      <TableCell align="right" sx={{ color: "white" }}>
-                        {`$${income.amount}`}
-                      </TableCell>
-                      <TableCell align="right" sx={{ color: "white" }}>
-                        <Button
-                          sx={{ color: "#FEE12B" }}
-                          onClick={() => {
-                            setOpenEditModal(true);
+                        </TableCell>
+                        <TableCell align="left" sx={{ color: "white" }}>
+                          {income.name}
+                        </TableCell>
+                        <TableCell align="right" sx={{ color: "white" }}>
+                          {`$${income.amount}`}
+                        </TableCell>
+                        <TableCell align="right" sx={{ color: "white" }}>
+                          <Button
+                            sx={{ color: "#FEE12B" }}
+                            onClick={() => {
+                              setOpenEditModal(true);
 
-                            setEditName(income.name);
-                            setEditNameID(income._id);
+                              setEditName(income.name);
+                              setEditNameID(income._id);
 
-                            setEditAmount(income.amount);
-                            setEditAmountID(income._id);
+                              setEditAmount(income.amount);
+                              setEditAmountID(income._id);
 
-                            setEditDescription(income.description);
-                            setEditDescriptionID(income._id);
+                              setEditDescription(income.description);
+                              setEditDescriptionID(income._id);
 
-                            setEditCategory(income.category._id);
-                            setEditCategoryID(income._id);
-                          }}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          sx={{ color: "#FEE12B" }}
-                          onClick={() => {
-                            setSelectedIncomeId(income._id);
-                            setOpenDeleteModal(true);
-                          }}
-                        >
-                          Delete
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-              </TableBody>
-            </Table>
-          </TableContainer>
+                              setEditCategory(income.category._id);
+                              setEditCategoryID(income._id);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            sx={{ color: "#FEE12B" }}
+                            onClick={() => {
+                              setSelectedIncomeId(income._id);
+                              setOpenDeleteModal(true);
+                            }}
+                          >
+                            Delete
+                          </Button>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </div>
         ) : (
           <Typography
             align="center"
@@ -313,18 +321,6 @@ export default function Income() {
           </Typography>
         )}
       </Container>
-      <Box
-        sx={{ display: "flex", justifyContent: "center", paddingTop: "30px" }}
-      >
-        <Button
-          endIcon={<AddCircleIcon />}
-          color="warning"
-          onClick={handleOpenIncomeDialog}
-          sx={{ justifyContent: "center", color: "#FEE12B" }}
-        >
-          Add Income
-        </Button>
-      </Box>
 
       {/* delete */}
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>

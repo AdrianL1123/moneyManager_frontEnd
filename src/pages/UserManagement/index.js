@@ -32,7 +32,9 @@ import {
   updateUser,
   deleteUser,
 } from "../../utils/api_signup";
+import { useNavigate } from "react-router-dom";
 export default function UserManagement() {
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const snackbar = useCustomSnackbar();
 
@@ -154,244 +156,275 @@ export default function UserManagement() {
 
   return (
     <>
-      <TopNav />
-      <Container style={{ paddingTop: "20px", width: "100%" }}>
-        <Typography
-          variant="h4"
-          color={"white"}
-          align="center"
-          paddingBottom={"20px"}
-        >
-          User Management
-        </Typography>
-        <Divider sx={{ borderColor: "white" }} />
+      {currentUser.role !== "admin" ? (
         <Container
           sx={{
-            display: "flex",
+            height: "100vh",
+            width: "100%",
+            display: " flex",
             justifyContent: "center",
-            alignItems: "center",
-            paddingTop: "20px",
+            color: "white",
             flexDirection: "column",
           }}
         >
+          <Typography variant="h2" align="center" color={"error"}>
+            Page not found
+          </Typography>
           <Button
-            endIcon={<PlaylistAddIcon />}
-            sx={{ fontSize: "12px", color: "#FEE12B" }}
-            onClick={handleOpenDialog}
+            color="warning"
+            onClick={() => {
+              navigate("/profile");
+            }}
           >
-            Add A User
+            Return back to profile
           </Button>
-          <TableContainer sx={{ maxWidth: "600px", width: "100%" }}>
-            <Table>
-              <TableHead>
-                <TableRow>
-                  <TableCell width={"20%"} sx={{ color: "white" }}>
-                    Name
-                  </TableCell>
-                  <TableCell align="left" sx={{ color: "white" }}>
-                    Email
-                  </TableCell>
-                  <TableCell align="left" sx={{ color: "white" }}>
-                    Role
-                  </TableCell>
-                  <TableCell align="right" sx={{ color: "white" }}>
-                    Actions
-                  </TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {users.length > 0 ? (
-                  users.map((u) => (
-                    <TableRow key={u._id}>
+        </Container>
+      ) : (
+        <>
+          <TopNav />
+          <Container style={{ paddingTop: "20px", width: "100%" }}>
+            <Typography
+              variant="h4"
+              color={"white"}
+              align="center"
+              paddingBottom={"20px"}
+            >
+              User Management
+            </Typography>
+            <Divider sx={{ borderColor: "white" }} />
+            <Container
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                paddingTop: "20px",
+                flexDirection: "column",
+              }}
+            >
+              <Button
+                endIcon={<PlaylistAddIcon />}
+                sx={{ fontSize: "12px", color: "#FEE12B" }}
+                onClick={handleOpenDialog}
+              >
+                Add A User
+              </Button>
+              <TableContainer sx={{ maxWidth: "600px", width: "100%" }}>
+                <Table>
+                  <TableHead>
+                    <TableRow>
                       <TableCell width={"20%"} sx={{ color: "white" }}>
-                        {u.name}
+                        Name
                       </TableCell>
                       <TableCell align="left" sx={{ color: "white" }}>
-                        {u.email}
+                        Email
                       </TableCell>
-                      <TableCell align="left" sx={{ colosr: "white" }}>
-                        {u.role === "admin" ? (
-                          <Typography color={"orange"}>Admin</Typography>
-                        ) : (
-                          <Typography color={"white"}>User</Typography>
-                        )}
+                      <TableCell align="left" sx={{ color: "white" }}>
+                        Role
                       </TableCell>
                       <TableCell align="right" sx={{ color: "white" }}>
-                        <Button
-                          sx={{ color: "#FEE12B" }}
-                          onClick={() => {
-                            setOpenEditModal(true);
-
-                            setEditName(u.name);
-                            setEditNameID(u._id);
-
-                            setEditEmail(u.email);
-                            setEditEmailID(u._id);
-
-                            setEditRole(u.role);
-                            setEditRoleID(u._id);
-                          }}
-                        >
-                          Edit
-                        </Button>
-                        <Button
-                          sx={{ color: "#FEE12B" }}
-                          onClick={() => handleDeleteUser(u._id)}
-                        >
-                          Remove
-                        </Button>
+                        Actions
                       </TableCell>
                     </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell
-                      colSpan={3}
-                      align="center"
-                      sx={{ color: "white" }}
-                    >
-                      No Users added yet
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Container>
-      </Container>
-      <BottomNav />
+                  </TableHead>
+                  <TableBody>
+                    {users.length > 0 ? (
+                      users.map((u) => (
+                        <TableRow key={u._id}>
+                          <TableCell width={"20%"} sx={{ color: "white" }}>
+                            {u.name}
+                          </TableCell>
+                          <TableCell align="left" sx={{ color: "white" }}>
+                            {u.email}
+                          </TableCell>
+                          <TableCell align="left" sx={{ colosr: "white" }}>
+                            {u.role === "admin" ? (
+                              <Typography color={"orange"}>Admin</Typography>
+                            ) : (
+                              <Typography color={"white"}>User</Typography>
+                            )}
+                          </TableCell>
+                          <TableCell align="right" sx={{ color: "white" }}>
+                            <Button
+                              sx={{ color: "#FEE12B" }}
+                              onClick={() => {
+                                setOpenEditModal(true);
 
-      {/* add dialog */}
-      <Dialog open={openDialog} onClose={handleCloseDialog}>
-        <DialogTitle>Add User</DialogTitle>;
-        <DialogContent>
-          <Grid container spacing={1}>
-            <Grid item xs={6}>
-              <Typography gutterBottom>Name</Typography>
+                                setEditName(u.name);
+                                setEditNameID(u._id);
+
+                                setEditEmail(u.email);
+                                setEditEmailID(u._id);
+
+                                setEditRole(u.role);
+                                setEditRoleID(u._id);
+                              }}
+                            >
+                              Edit
+                            </Button>
+                            <Button
+                              sx={{ color: "#FEE12B" }}
+                              onClick={() => handleDeleteUser(u._id)}
+                            >
+                              Remove
+                            </Button>
+                          </TableCell>
+                        </TableRow>
+                      ))
+                    ) : (
+                      <TableRow>
+                        <TableCell
+                          colSpan={3}
+                          align="center"
+                          sx={{ color: "white" }}
+                        >
+                          No Users added yet
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+            </Container>
+          </Container>
+          <BottomNav />
+
+          {/* add dialog */}
+          <Dialog open={openDialog} onClose={handleCloseDialog}>
+            <DialogTitle>Add User</DialogTitle>;
+            <DialogContent>
+              <Grid container spacing={1}>
+                <Grid item xs={6}>
+                  <Typography gutterBottom>Name</Typography>
+                  <TextField
+                    placeholder="Your name here..."
+                    variant="outlined"
+                    fullWidth
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    margin="dense"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography gutterBottom>Email</Typography>
+                  <TextField
+                    placeholder="Your email here..."
+                    variant="outlined"
+                    fullWidth
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    margin="dense"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography gutterBottom>Password</Typography>
+                  <TextField
+                    placeholder="Your password here..."
+                    variant="outlined"
+                    fullWidth
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    margin="dense"
+                  />
+                </Grid>
+                <Grid item xs={6}>
+                  <Typography gutterBottom>Confirm Password</Typography>
+                  <TextField
+                    placeholder="Confirm Password"
+                    variant="outlined"
+                    fullWidth
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    margin="dense"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Typography gutterBottom>Role</Typography>
+                  <Select
+                    labelId="role-select-label"
+                    id="role-select"
+                    fullWidth
+                    value={role}
+                    onChange={(e) => setRole(e.target.value)}
+                    margin="dense"
+                  >
+                    <MenuItem value="Admin">Admin</MenuItem>
+                    <MenuItem value="User">User</MenuItem>
+                  </Select>
+                </Grid>
+              </Grid>
+            </DialogContent>
+            <DialogActions sx={{ justifyContent: "center" }}>
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={handleCloseDialog}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={handleAddUser}
+              >
+                Add
+              </Button>
+            </DialogActions>
+          </Dialog>
+          {/* add dialog */}
+
+          {/* //edit dialog */}
+          <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
+            <DialogTitle>Edit User</DialogTitle>
+            <DialogContent>
               <TextField
-                placeholder="Your name here..."
+                placeholder="Category"
                 variant="outlined"
                 fullWidth
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                margin="dense"
+                sx={{ marginBottom: "10px" }}
+                value={editName}
+                onChange={(e) => setEditName(e.target.value)}
               />
-            </Grid>
-            <Grid item xs={6}>
-              <Typography gutterBottom>Email</Typography>
               <TextField
-                placeholder="Your email here..."
                 variant="outlined"
                 fullWidth
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                margin="dense"
+                sx={{ marginBottom: "10px" }}
+                value={editEmail}
+                onChange={(e) => setEditEmail(e.target.value)}
               />
-            </Grid>
-            <Grid item xs={6}>
-              <Typography gutterBottom>Password</Typography>
-              <TextField
-                placeholder="Your password here..."
-                variant="outlined"
-                fullWidth
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                margin="dense"
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <Typography gutterBottom>Confirm Password</Typography>
-              <TextField
-                placeholder="Confirm Password"
-                variant="outlined"
-                fullWidth
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                margin="dense"
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <Typography gutterBottom>Role</Typography>
               <Select
                 labelId="role-select-label"
                 id="role-select"
                 fullWidth
-                value={role}
-                onChange={(e) => setRole(e.target.value)}
+                value={editRole}
+                onChange={(e) => setEditRole(e.target.value)}
                 margin="dense"
               >
-                <MenuItem value="Admin">Admin</MenuItem>
-                <MenuItem value="User">User</MenuItem>
+                <MenuItem value="admin">Admin</MenuItem>
+                <MenuItem value="user">User</MenuItem>
               </Select>
-            </Grid>
-          </Grid>
-        </DialogContent>
-        <DialogActions sx={{ justifyContent: "center" }}>
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={handleCloseDialog}
-          >
-            Cancel
-          </Button>
-          <Button variant="contained" color="warning" onClick={handleAddUser}>
-            Add
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* add dialog */}
-
-      {/* //edit dialog */}
-      <Dialog open={openEditModal} onClose={() => setOpenEditModal(false)}>
-        <DialogTitle>Edit User</DialogTitle>
-        <DialogContent>
-          <TextField
-            placeholder="Category"
-            variant="outlined"
-            fullWidth
-            sx={{ marginBottom: "10px" }}
-            value={editName}
-            onChange={(e) => setEditName(e.target.value)}
-          />
-          <TextField
-            variant="outlined"
-            fullWidth
-            sx={{ marginBottom: "10px" }}
-            value={editEmail}
-            onChange={(e) => setEditEmail(e.target.value)}
-          />
-          <Select
-            labelId="role-select-label"
-            id="role-select"
-            fullWidth
-            value={editRole}
-            onChange={(e) => setEditRole(e.target.value)}
-            margin="dense"
-          >
-            <MenuItem value="admin">Admin</MenuItem>
-            <MenuItem value="user">User</MenuItem>
-          </Select>
-        </DialogContent>
-        <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={() => setOpenEditModal(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="contained"
-            color="warning"
-            onClick={() => handleEdit()}
-          >
-            Edit
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* //edit dialog */}
+            </DialogContent>
+            <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={() => setOpenEditModal(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="contained"
+                color="warning"
+                onClick={() => handleEdit()}
+              >
+                Edit
+              </Button>
+            </DialogActions>
+          </Dialog>
+          {/* //edit dialog */}
+        </>
+      )}
     </>
   );
 }

@@ -11,6 +11,7 @@ import useCustomSnackbar from "../../components/useCustomSnackbar";
 import CategoryIcon from "@mui/icons-material/Category";
 import MoneyIcon from "@mui/icons-material/Money";
 import PaidIcon from "@mui/icons-material/Paid";
+import SubscriptionsIcon from "@mui/icons-material/Subscriptions";
 import {
   Button,
   Dialog,
@@ -30,8 +31,7 @@ export default function BottomNav() {
 
   const [cookies] = useCookies(["currentUser"]);
   const { currentUser = {} } = cookies;
-  const { role, token } = currentUser;
-
+  const { role, token, _id } = currentUser;
   const { data: subscriptions = [] } = useQuery({
     queryKey: ["subscription", token],
     queryFn: () => getSubscriptions(token),
@@ -41,7 +41,7 @@ export default function BottomNav() {
   const addNewSubscriptionMutation = useMutation({
     mutationFn: addNewSubscription,
     onSuccess: (responseData) => {
-      const billplz_url = responseData.data.billplz_url;
+      const billplz_url = responseData.billplz_url;
       window.location.href = billplz_url;
     },
     onError: (error) => {
@@ -79,9 +79,17 @@ export default function BottomNav() {
       >
         <BottomNavigationAction
           onClick={() => {
-            setOpenChartsModal(true);
+            const gotSub = subscriptions.find(
+              (subscription) =>
+                subscription.user_id === _id && subscription.status === "paid"
+            );
+            if (gotSub) {
+              navigate("/charts");
+            } else {
+              setOpenChartsModal(true);
+            }
           }}
-          label="Charts"
+          label="Summary"
           icon={<DataSaverOffIcon />}
           sx={{
             color: "white",
@@ -91,7 +99,9 @@ export default function BottomNav() {
           open={openChartsModal}
           onClose={() => setOpenChartsModal(false)}
         >
-          <DialogTitle>In order to access Charts, PAY FIRST LA BRO</DialogTitle>
+          <DialogTitle>
+            In order to access your expenses summary, PAY FIRST LA BRO
+          </DialogTitle>
           <DialogContent>Do you still want to proceed?</DialogContent>
           <DialogActions sx={{ display: "flex", justifyContent: "center" }}>
             <Button
@@ -111,16 +121,6 @@ export default function BottomNav() {
           </DialogActions>
         </Dialog>
         <BottomNavigationAction
-          onClick={() => {
-            navigate("/");
-          }}
-          label="Expenses"
-          icon={<MoneyIcon />}
-          sx={{
-            color: "white",
-          }}
-        />
-        <BottomNavigationAction
           label="Me"
           icon={<AccountCircleIcon />}
           sx={{
@@ -128,6 +128,16 @@ export default function BottomNav() {
           }}
           onClick={() => {
             navigate("/profile");
+          }}
+        />
+        <BottomNavigationAction
+          onClick={() => {
+            navigate("/");
+          }}
+          label="Expenses"
+          icon={<MoneyIcon />}
+          sx={{
+            color: "white",
           }}
         />
         <BottomNavigationAction
@@ -162,17 +172,17 @@ export default function BottomNav() {
               navigate("/categoriesIncome");
             }}
           />,
+          <BottomNavigationAction
+            label="Subscriptions"
+            icon={<SubscriptionsIcon />}
+            sx={{
+              color: "white",
+            }}
+            onClick={() => {
+              navigate("/subscription");
+            }}
+          />,
         ]}
-        <BottomNavigationAction
-          label="Subscriptions"
-          icon={<PaidIcon />}
-          sx={{
-            color: "white",
-          }}
-          onClick={() => {
-            navigate("/subscription");
-          }}
-        />
       </BottomNavigation>
     </Box>
   );

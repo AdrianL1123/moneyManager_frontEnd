@@ -63,7 +63,6 @@ export default function Home() {
     queryKey: ["expenses", category, token],
     queryFn: () => getExpenses(category, token),
   });
-
   const { data: categories = [] } = useQuery({
     queryKey: ["categories"],
     queryFn: () => getCategories(),
@@ -166,12 +165,13 @@ export default function Home() {
     <>
       <TopNav />
       <Container
+        maxWidth="xl"
         style={{
-          paddingTop: "20px",
+          height: "auto",
           width: "100%",
           display: "flex",
           alignItems: "center",
-          justifyContent: "center",
+          justifyContent: "space-between",
           flexDirection: "column",
         }}
       >
@@ -207,10 +207,22 @@ export default function Home() {
               gap: 2,
             }}
           >
+            <Button
+              endIcon={<AddCircleIcon />}
+              color="warning"
+              onClick={handleOpenMainDialog}
+              sx={{ justifyContent: "center", color: "#FEE12B" }}
+            >
+              Add Expenses
+            </Button>
             <Select
               color="warning"
+              variant="standard"
               value={category}
-              sx={{ backgroundColor: "#FEE12B", borderRadius: "4px" }}
+              sx={{
+                color: "#FEE12B",
+                padding: "15px",
+              }}
               onChange={(e) => {
                 setCategory(e.target.value);
               }}
@@ -222,18 +234,6 @@ export default function Home() {
                 </MenuItem>
               ))}
             </Select>
-            <Select
-              color="warning"
-              value={amount}
-              sx={{ backgroundColor: "#FEE12B", borderRadius: "4px" }}
-              onChange={(e) => {
-                setAmount(e.target.value);
-              }}
-            >
-              <MenuItem value="Normal">Normal Amount</MenuItem>
-              <MenuItem value="Ascending">Ascending Amount</MenuItem>
-              <MenuItem value="Descending">Descending Amount</MenuItem>
-            </Select>
           </Box>
           <Divider
             sx={{
@@ -243,10 +243,14 @@ export default function Home() {
             }}
           />
           {expenses.length > 0 ? (
-            <>
-              <TableContainer
-                sx={{ maxWidth: "100%", width: "100%", marginBottom: "20px" }}
-              >
+            <div
+              style={{
+                height: "auto",
+                width: "100%",
+                overflow: "auto",
+              }}
+            >
+              <TableContainer>
                 <Table>
                   <>
                     <TableHead>
@@ -335,7 +339,7 @@ export default function Home() {
                   </>
                 </Table>
               </TableContainer>
-            </>
+            </div>
           ) : (
             <Typography
               align="center"
@@ -347,17 +351,6 @@ export default function Home() {
           )}
         </Container>
       </Container>
-
-      <Box sx={{ display: "flex", justifyContent: "center", padding: "20px" }}>
-        <Button
-          endIcon={<AddCircleIcon />}
-          color="warning"
-          onClick={handleOpenMainDialog}
-          sx={{ justifyContent: "center", color: "#FEE12B" }}
-        >
-          Add Expenses
-        </Button>
-      </Box>
 
       {/* delete */}
       <Dialog open={openDeleteModal} onClose={() => setOpenDeleteModal(false)}>

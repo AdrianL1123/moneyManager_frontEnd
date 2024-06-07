@@ -57,8 +57,6 @@ export default function IncomeEdit() {
     queryFn: () => getIncome(_id),
   });
 
-  console.log(income);
-
   const { data: categoriesIncome = [] } = useQuery({
     queryKey: ["categoriesIncome"],
     queryFn: () => getCategoriesIncome(),

@@ -122,6 +122,17 @@ export default function Login() {
               Log In
             </Button>
           </Grid>
+          <Grid item xs={12} sx={{ paddingTop: "10px" }}>
+            <Button
+              onClick={() => {
+                navigate("/profile");
+              }}
+              fullWidth
+              sx={{ color: "#FEE12B" }}
+            >
+              back to profile
+            </Button>
+          </Grid>
         </Container>
         <Divider
           sx={{

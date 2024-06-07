@@ -153,7 +153,6 @@ export default function Income() {
   return (
     <>
       <TopNav />
-
       <DialogIncomeAdd
         openIncomeDialog={openIncomeDialog}
         handleCloseIncomeDialog={handleCloseIncomeDialog}

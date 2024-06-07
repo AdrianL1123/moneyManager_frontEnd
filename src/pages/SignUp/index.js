@@ -153,6 +153,17 @@ export default function Signup() {
                 Sign up
               </Button>
             </Grid>
+            <Grid item xs={12}>
+              <Button
+                onClick={() => {
+                  navigate("/profile");
+                }}
+                fullWidth
+                sx={{ color: "#FEE12B" }}
+              >
+                back to profile
+              </Button>
+            </Grid>
           </Grid>
         </Container>
         <Divider

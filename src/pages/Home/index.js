@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useCookies } from "react-cookie";
 import { useQuery } from "@tanstack/react-query";
 import {
@@ -42,8 +42,17 @@ import {
 import DialogMainAdd from "../../components/Dialog_MainAdd";
 import { getCategories } from "../../utils/api_categories";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
+  const NotFoundPage = ({ currentUser }) => {
+    useEffect(() => {
+      if (!currentUser) {
+        navigate("/profile");
+      }
+    }, [currentUser]);
+  };
+  const navigate = useNavigate();
   const queryClient = useQueryClient();
   const snackbar = useCustomSnackbar();
 

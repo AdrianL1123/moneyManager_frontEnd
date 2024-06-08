@@ -147,7 +147,7 @@ export default function UserManagement() {
 
   const handleDeleteUser = (_id) => {
     const answer = window.confirm(
-      "Are you sure you want to remove this category?"
+      "Are you sure you want to remove this User ?"
     );
     if (answer) {
       deleteUserMutation.mutate({ token, _id });

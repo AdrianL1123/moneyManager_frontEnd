@@ -106,7 +106,7 @@ export default function Income() {
   const updateCategoryMutation = useMutation({
     mutationFn: updateIncome,
     onSuccess: () => {
-      snackbar.showSuccess("Expense has been updated successfully.");
+      snackbar.showSuccess("Income has been updated successfully.");
       queryClient.invalidateQueries(["incomes"]);
       setOpenEditModal(false);
     },
@@ -116,12 +116,7 @@ export default function Income() {
   });
 
   const handleEdit = () => {
-    if (
-      editName === "" ||
-      editAmount <= 0 ||
-      editDescription === "" ||
-      editCategory === "All Types"
-    ) {
+    if (editName === "" || editAmount <= 0 || editCategory === "All Types") {
       snackbar.showWarning("Please fill in the details.");
     } else {
       updateCategoryMutation.mutate({

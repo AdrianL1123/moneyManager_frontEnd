@@ -130,12 +130,7 @@ export default function Home() {
   });
 
   const handleEdit = () => {
-    if (
-      editName === "" ||
-      editAmount <= 0 ||
-      editDescription === "" ||
-      editCategory === "All Types"
-    ) {
+    if (editName === "" || editAmount <= 0 || editCategory === "All Types") {
       snackbar.showWarning("Please fill in the details.");
     } else {
       updateCategoryMutation.mutate({

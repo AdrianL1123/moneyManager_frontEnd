@@ -154,7 +154,7 @@ export default function Subscription() {
                               {s.status === "paid" ? (
                                 <Typography color={"primary"}>Paid</Typography>
                               ) : (
-                                <Typography color={"error"}>Pending</Typography>
+                                <Typography color={"error"}>Failed</Typography>
                               )}
                             </TableCell>
                             {s.paid_at ? (
@@ -168,7 +168,7 @@ export default function Subscription() {
                             )}
 
                             <TableCell align="right" sx={{ color: "white" }}>
-                              {s.status === "pending" && (
+                              {s.status === "failed" && (
                                 <Button
                                   variant="outlined"
                                   color="error"

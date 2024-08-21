@@ -17,6 +17,7 @@ export default function CustomSnackbar({
       autoHideDuration={3000}
       {...SnackbarProps}
     >
+      {/* use nulliish here */}
       <Alert
         severity={customParameters?.type}
         action={

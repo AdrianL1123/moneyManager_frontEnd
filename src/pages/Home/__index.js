@@ -163,70 +163,6 @@ export default function Home() {
     }
   };
 
-  const filteredExpenses = [];
-  for (let i = 0; i < expenses.length; i++) {
-    const expense = expenses[i];
-    if (expense.user_id === _id) {
-      const { _id, created_at, category, name, amount } = expense;
-      filteredExpenses.push(
-        <TableRow key={_id}>
-          {i % 2 === 0 ? (
-            <TableCell align="left" sx={{ color: "red" }}>
-              {created_at.split("T")[0]}
-            </TableCell>
-          ) : (
-            <TableCell align="left" sx={{ color: "gray" }}>
-              {created_at.split("T")[0]}
-            </TableCell>
-          )}
-          <TableCell align="left" sx={{ color: "white", width: "20%" }}>
-            <Box sx={{ display: "flex", alignItems: "center" }}>
-              {getIconComponent(category.name)}
-              <Box sx={{ margin: "5px" }}>{category.name}</Box>
-            </Box>
-          </TableCell>
-          <TableCell align="left" sx={{ color: "white" }}>
-            {name}
-          </TableCell>
-          <TableCell align="right" sx={{ color: "white" }}>
-            {`$${amount}`}
-          </TableCell>
-          <TableCell align="right" sx={{ color: "white" }}>
-            <Button
-              sx={{ color: "#FEE12B" }}
-              onClick={() => {
-                setOpenEditModal(true);
-
-                setEditName(expense.name);
-                setEditNameID(expense._id);
-
-                setEditAmount(expense.amount);
-                setEditAmountID(expense._id);
-
-                setEditDescription(expense.description);
-                setEditDescriptionID(expense._id);
-
-                setEditCategory(expense.category._id);
-                setEditCategoryID(expense._id);
-              }}
-            >
-              Edit
-            </Button>
-            <Button
-              sx={{ color: "#FEE12B" }}
-              onClick={() => {
-                setSelectedExpenseId(expense._id);
-                setOpenDeleteModal(true);
-              }}
-            >
-              Delete
-            </Button>
-          </TableCell>
-        </TableRow>
-      );
-    }
-  }
-
   return (
     <>
       <TopNav />
@@ -345,7 +281,65 @@ export default function Home() {
                       {/* challenge print out the expenses without filter and map */}
                       {/* challenge 2 change the odd numbered rows show the date in red*/}
                       {/* challenge 3 do not use expense.user_id , expsnes.category, etc. (no dot notation) */}
-                      {filteredExpenses}
+                      {expenses
+                        .filter((expense) => expense.user_id === _id)
+                        .map((expense) => (
+                          <TableRow key={expense._id}>
+                            <TableCell align="left" sx={{ color: "gray" }}>
+                              {expense.created_at.split("T")[0]}
+                            </TableCell>
+                            <TableCell
+                              align="left"
+                              sx={{ color: "white", width: "20%" }}
+                            >
+                              <Box
+                                sx={{ display: "flex", alignItems: "center" }}
+                              >
+                                {getIconComponent(expense.category.name)}
+                                <Box sx={{ margin: "5px" }}>
+                                  {expense.category.name}
+                                </Box>
+                              </Box>
+                            </TableCell>
+                            <TableCell align="left" sx={{ color: "white" }}>
+                              {expense.name}
+                            </TableCell>
+                            <TableCell align="right" sx={{ color: "white" }}>
+                              {`$${expense.amount}`}
+                            </TableCell>
+                            <TableCell align="right" sx={{ color: "white" }}>
+                              <Button
+                                sx={{ color: "#FEE12B" }}
+                                onClick={() => {
+                                  setOpenEditModal(true);
+
+                                  setEditName(expense.name);
+                                  setEditNameID(expense._id);
+
+                                  setEditAmount(expense.amount);
+                                  setEditAmountID(expense._id);
+
+                                  setEditDescription(expense.description);
+                                  setEditDescriptionID(expense._id);
+
+                                  setEditCategory(expense.category._id);
+                                  setEditCategoryID(expense._id);
+                                }}
+                              >
+                                Edit
+                              </Button>
+                              <Button
+                                sx={{ color: "#FEE12B" }}
+                                onClick={() => {
+                                  setSelectedExpenseId(expense._id);
+                                  setOpenDeleteModal(true);
+                                }}
+                              >
+                                Delete
+                              </Button>
+                            </TableCell>
+                          </TableRow>
+                        ))}
                     </TableBody>
                   </>
                 </Table>

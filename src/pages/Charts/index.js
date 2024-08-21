@@ -20,7 +20,7 @@ export default function Charts() {
     queryKey: ["subscription", token],
     queryFn: () => getSubscriptions(token),
   });
-  console.log(subscriptions);
+  // console.log(subscriptions);
 
   const [category, setCategory] = useState("Category");
 

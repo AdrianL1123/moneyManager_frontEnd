@@ -166,9 +166,9 @@ export default function Subscription() {
                                 Not paid Yet
                               </TableCell>
                             )}
-
+                            {/* challenge 5 if it is failed show failed button, if completed show 'OK' */}
                             <TableCell align="right" sx={{ color: "white" }}>
-                              {s.status === "failed" && (
+                              {s.status === "failed" ? (
                                 <Button
                                   variant="outlined"
                                   color="error"
@@ -178,6 +178,8 @@ export default function Subscription() {
                                 >
                                   Remove
                                 </Button>
+                              ) : (
+                                <Typography>OK</Typography>
                               )}
                             </TableCell>
                           </TableRow>
